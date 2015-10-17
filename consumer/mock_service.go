@@ -12,7 +12,9 @@ type MockProviderService interface {
 	VerifyInteractions() error
 }
 
-//this can be private, needs to implement the above functionality
+//this can be private, needs to implement the above interface
+//look into httptest package, we can create test server from there for a mock server
+
 type mockService struct {
 	providerRequest  *ProviderRequest
 	ProviderResponse *ProviderResponse

@@ -4,7 +4,16 @@ import (
 	"fmt"
 )
 
-type MockService struct {
+type MockProviderService interface {
+	Given(state string) MockProviderService
+	UponReceiving(description string) MockProviderService
+	With(request *ProviderRequest) MockProviderService
+	WillRespondWith(response *ProviderResponse)
+	VerifyInteractions() error
+}
+
+//this can be private, needs to implement the above functionality
+type mockService struct {
 	providerRequest  *ProviderRequest
 	ProviderResponse *ProviderResponse
 }

@@ -3,7 +3,7 @@ package consumer
 type PactBuilder interface {
 	ServiceConsumer(consumer string) PactBuilder
 	HasPactWith(serviceProvider string) PactBuilder
-	GetMockProviderService() MockProviderService
+	GetMockProviderService() *MockProviderService
 	Build() error
 }
 
@@ -16,10 +16,10 @@ type ConsumerPactBuilder struct {
 	consumer            string
 	serviceProvider     string
 	config              *PactConfig
-	mockProviderService MockProviderService
+	mockProviderService *MockProviderService
 }
 
-func NewConsumerPactBuilder(pactConfig *PactConfig) PactBuilder {
+func NewConsumerPactBuilder(pactConfig *PactConfig) *ConsumerPactBuilder {
 	return &ConsumerPactBuilder{config: pactConfig}
 }
 
@@ -31,6 +31,11 @@ func (c *ConsumerPactBuilder) ServiceConsumer(consumer string) PactBuilder {
 func (c *ConsumerPactBuilder) HasPactWith(serviceProvider string) PactBuilder {
 	c.serviceProvider = serviceProvider
 	return c
+}
+
+func (c *ConsumerPactBuilder) GetMockProviderService() *MockProviderService {
+	c.mockProviderService = NewMockProviderService(c.config)
+	return c.mockProviderService
 }
 
 func (c *ConsumerPactBuilder) Build() error {

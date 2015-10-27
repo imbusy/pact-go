@@ -1,12 +1,15 @@
 package consumer
 
-import ()
+import (
+	"net/http"
+)
 
 type ProviderService interface {
 	Given(state string) ProviderService
 	UponReceiving(description string) ProviderService
 	With(request *ProviderRequest) ProviderService
-	WillRespondWith(response *ProviderResponse)
+	WillRespondWith(response *ProviderResponse) ProviderService
+	ClearInteractions() ProviderService
 	VerifyInteractions() error
 }
 
@@ -18,24 +21,25 @@ type MockProviderService struct {
 	providerResponse *ProviderResponse
 	state            string
 	description      string
+	service          *httpMockService
 }
 
 type ProviderRequest struct {
-	method  string
-	path    string
-	query   string
-	headers map[string]string
-	body    string
+	Method  string
+	Path    string
+	Query   string
+	Headers http.Header
+	Body    string
 }
 
 type ProviderResponse struct {
-	status  string
-	headers map[string]string
-	body    string
+	Status  int
+	Headers map[string]string
+	Body    string
 }
 
 func NewMockProviderService(config *PactConfig) *MockProviderService {
-	return &MockProviderService{}
+	return &MockProviderService{service: newHttpMockService()}
 }
 
 func (p *MockProviderService) Given(state string) ProviderService {
@@ -53,15 +57,32 @@ func (p *MockProviderService) With(providerRequest *ProviderRequest) ProviderSer
 	return p
 }
 
-func (p *MockProviderService) WillRespondWith(providerResponse *ProviderResponse) {
+func (p *MockProviderService) WillRespondWith(providerResponse *ProviderResponse) ProviderService {
 	p.providerResponse = providerResponse
-	p.registerInteractions()
+	p.registerInteraction()
+	p.resetTransientState()
+	return p
+}
+
+func (p *MockProviderService) ClearInteractions() ProviderService {
+	p.service.ClearInteractions()
+	p.resetTransientState()
+	return p
 }
 
 func (p *MockProviderService) VerifyInteractions() error {
+
 	return nil
 }
 
-func (p *MockProviderService) registerInteractions() {
+func (p *MockProviderService) registerInteraction() {
+	interaction := NewInteraction(p.state, p.description, p.providerRequest, p.providerResponse)
+	p.service.RegisterInteraction(interaction)
+}
 
+func (p *MockProviderService) resetTransientState() {
+	p.state = ""
+	p.description = ""
+	p.providerRequest = nil
+	p.providerResponse = nil
 }

@@ -1,7 +1,7 @@
 package consumer
 
 import (
-	"fmt"
+	"errors"
 	"github.com/bennycao/pact-go/comparers"
 	"net/http"
 	"net/http/httptest"
@@ -12,29 +12,35 @@ type httpMockService struct {
 	interactions []*Interaction
 }
 
+var (
+	notFoundError = errors.New("No matching interaction found.")
+)
+
 func newHttpMockService() *httpMockService {
 	return &httpMockService{interactions: make([]*Interaction, 0)}
 }
 
 func (ms *httpMockService) Start() string {
+	if ms.server == nil {
+		ms.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-	ms.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		matchedInteraction := ms.findMatchingInteraction(r, ms.interactions)
-		if matchedInteraction == nil {
-			//return error
-			http.NotFound(w, r)
-		} else {
-
-			w.WriteHeader(matchedInteraction.Response.Status)
-		}
-	}))
-
+			matchedInteraction, err := ms.findMatchingInteraction(r, ms.interactions)
+			if matchedInteraction == nil && err == nil {
+				http.Error(w, notFoundError.Error(), http.StatusNotFound)
+			} else if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+			} else {
+				w.WriteHeader(matchedInteraction.Response.Status)
+			}
+		}))
+	}
 	return ms.server.URL
 }
 
 func (ms *httpMockService) Stop() {
-	ms.server.Close()
+	if ms.server != nil {
+		ms.server.Close()
+	}
 }
 
 func (ms *httpMockService) RegisterInteraction(interaction *Interaction) {
@@ -46,19 +52,24 @@ func (ms *httpMockService) ClearInteractions() {
 	ms.interactions = make([]*Interaction, 0)
 }
 
-func (ms *httpMockService) findMatchingInteraction(r *http.Request, interactions []*Interaction) *Interaction {
+func (ms *httpMockService) findMatchingInteraction(r *http.Request, interactions []*Interaction) (*Interaction, error) {
 
 	for i := range interactions {
-		req, _ := interactions[i].ToHttpRequest(ms.server.URL)
+		req, err := interactions[i].ToHttpRequest(ms.server.URL)
 
-		result, _ := comparers.MatchRequest(req, r)
-		fmt.Println(result)
+		if err != nil {
+			return nil, err
+		}
+
+		result, err := comparers.MatchRequest(req, r)
+
+		if err != nil {
+			return nil, err
+		}
 
 		if result {
-			fmt.Println("found match")
-
-			return interactions[i]
+			return interactions[i], nil
 		}
 	}
-	return nil
+	return nil, nil
 }

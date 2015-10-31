@@ -30,6 +30,10 @@ func urlMatches(expected, actual *url.URL) bool {
 }
 
 func containsAllHeaders(expected, actual map[string][]string) bool {
+	if len(expected) > len(actual) {
+		return false
+	}
+
 	for key, val := range expected {
 		if !strings.EqualFold(val[0], actual[key][0]) {
 			return false

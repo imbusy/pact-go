@@ -1,7 +1,10 @@
 package consumer
 
 import (
+	"encoding/json"
+	"net/http/httptest"
 	"net/url"
+	"reflect"
 	"testing"
 )
 
@@ -18,7 +21,7 @@ func Test_InvalidUrl_MappingToHttpRequestFails(t *testing.T) {
 	}
 }
 
-func Test_ValidInteraction_MapsToHttpRequest(t *testing.T) {
+func Test_ValidRequest_MapsToHttpRequest(t *testing.T) {
 	interaction := getFakeInteraction()
 	baseUrl, _ := url.Parse("http://localhost:52343/")
 	req, err := interaction.ToHttpRequest(baseUrl.String())
@@ -43,4 +46,47 @@ func Test_ValidInteraction_MapsToHttpRequest(t *testing.T) {
 	if req.URL.RawQuery != interaction.Request.Query {
 		t.Error("Url query not mapped correctly")
 	}
+}
+
+func Test_BodyIsNotJson_ReturnsError(t *testing.T) {
+	interaction := getFakeInteraction()
+	interaction.Response.Body = "not json"
+	rec := httptest.NewRecorder()
+
+	if err := interaction.WriteToHttpResponse(rec); err == nil {
+		t.Error("Expected to throw error")
+	}
+}
+
+func Test_ValidResponse_WritesToHttpResponse(t *testing.T) {
+	interaction := getFakeInteraction()
+	rec := httptest.NewRecorder()
+
+	interaction.WriteToHttpResponse(rec)
+
+	if rec.Code != interaction.Response.Status {
+		t.Errorf("Expected status %v, but recieved %v", interaction.Response.Status, rec.Code)
+	}
+
+	respHeader := rec.Header()
+	for header, val := range interaction.Response.Headers {
+		if val[0] != respHeader.Get(header) {
+			t.Errorf("Expected header %s to have %s, but recieved %s", header, val[0], respHeader.Get(header))
+		}
+	}
+
+	expectedObj, _ := getJsonObj(interaction.Response.Body)
+	actualObj, _ := getJsonObj(rec.Body.String())
+
+	if !reflect.DeepEqual(expectedObj, actualObj) {
+		t.Errorf("Expected body %s \r\n but recieved %s", interaction.Response.Body, rec.Body.String())
+	}
+}
+
+func getJsonObj(jsonText string) (interface{}, error) {
+	var obj interface{}
+	if err := json.Unmarshal([]byte(jsonText), &obj); err != nil {
+		return nil, err
+	}
+	return obj, nil
 }

@@ -1,8 +1,10 @@
 package consumer
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -26,6 +28,26 @@ func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
 
 	if resp.StatusCode != interaction.Response.Status {
 		t.Errorf("The response status is %s, expected %v", resp.Status, interaction.Response.Status)
+		t.FailNow()
+	}
+
+	defer resp.Body.Close()
+	var expectedBody, actualBody interface{}
+
+	if err := json.Unmarshal([]byte(interaction.Response.Body), &expectedBody); err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+
+	if err := decoder.Decode(&actualBody); err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if !reflect.DeepEqual(expectedBody, actualBody) {
+		t.Error("The response body is does not match")
 	}
 }
 
@@ -73,6 +95,10 @@ func getFakeInteraction() *Interaction {
 			Body:    `{ "firstName": "John", "lastName": "Doe" }`,
 			Headers: header,
 		},
-		Response: &ProviderResponse{Status: 201},
+		Response: &ProviderResponse{
+			Status:  201,
+			Headers: header,
+			Body:    `{"result": true}`,
+		},
 	}
 }

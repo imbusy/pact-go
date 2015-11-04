@@ -30,7 +30,7 @@ func (ms *httpMockService) Start() string {
 			} else if err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 			} else {
-				w.WriteHeader(matchedInteraction.Response.Status)
+				matchedInteraction.WriteToHttpResponse(w)
 			}
 		}))
 	}

@@ -34,7 +34,7 @@ type ProviderRequest struct {
 
 type ProviderResponse struct {
 	Status  int
-	Headers map[string]string
+	Headers http.Header
 	Body    string
 }
 

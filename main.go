@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/bennycao/pact-go/consumer"
+	_ "github.com/bennycao/pact-go/consumer"
 )
 
 func main() {

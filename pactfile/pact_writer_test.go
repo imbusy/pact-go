@@ -7,6 +7,15 @@ import (
 	"testing"
 )
 
+func Test_InvalidPath_ShouldThrowError(t *testing.T) {
+	pact := NewPactFile("consumer", "provider", nil)
+	writer := NewPactFileWriter(pact, "//g34/example")
+
+	if err := writer.Write(); err == nil {
+		t.Error("expected error as file path is invalid")
+	}
+}
+
 func Test_ValidPact_ShouldWritePactFile(t *testing.T) {
 	var interactions []*consumer.Interaction
 	interactions = append(interactions, getFakeInteraction())

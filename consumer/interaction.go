@@ -9,13 +9,13 @@ import (
 )
 
 type Interaction struct {
-	State       string                    `json:"state"`
-	Description string                    `json:"description"`
-	Request     *prvider.ProviderRequest  `json:"request"`
-	Response    *povider.ProviderResponse `json:"response"`
+	State       string                     `json:"provider_state", omitempty`
+	Description string                     `json:"description"`
+	Request     *provider.ProviderRequest  `json:"request"`
+	Response    *provider.ProviderResponse `json:"response"`
 }
 
-func NewInteraction(state string, description string, request *provider.ProviderRequest,
+func NewInteraction(description string, state string, request *provider.ProviderRequest,
 	response *provider.ProviderResponse) *Interaction {
 	return &Interaction{
 		State:       state,

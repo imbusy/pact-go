@@ -83,10 +83,10 @@ func Test_MatchingInteractionNotFound_Returns404(t *testing.T) {
 func getFakeInteraction() *Interaction {
 	header := make(http.Header)
 	header.Add("content-type", "application/json")
-	i := &Interaction{
-		Request:  provider.NewProviderRequest("GET", "/", "param=xyzmk", header),
-		Response: provider.NewProviderResponse(201, header),
-	}
+	i := NewInteraction("description of the interaction",
+		"some state",
+		provider.NewProviderRequest("GET", "/", "param=xyzmk", header),
+		provider.NewProviderResponse(201, header))
 	i.Request.SetBody(`{ "firstName": "John", "lastName": "Doe" }`)
 
 	return i

@@ -62,7 +62,7 @@ func (p *MockProviderService) VerifyInteractions() error {
 }
 
 func (p *MockProviderService) registerInteraction() {
-	interaction := NewInteraction(p.state, p.description, p.providerRequest, p.providerResponse)
+	interaction := NewInteraction(p.description, p.state, p.providerRequest, p.providerResponse)
 	p.service.RegisterInteraction(interaction)
 }
 

@@ -29,7 +29,7 @@ func (p *ProviderRequest) MarshalJSON() ([]byte, error) {
 			"method":  p.Method,
 			"path":    p.Path,
 			"query":   p.Query,
-			"headers": p.Headers,
+			"headers": getHeaderWithSingleValues(p.Headers),
 			"body":    p.data,
 		})
 	} else if len(p.sliceData) > 0 {
@@ -37,7 +37,7 @@ func (p *ProviderRequest) MarshalJSON() ([]byte, error) {
 			"method":  p.Method,
 			"path":    p.Path,
 			"query":   p.Query,
-			"headers": p.Headers,
+			"headers": getHeaderWithSingleValues(p.Headers),
 			"body":    p.sliceData,
 		})
 	} else {
@@ -45,8 +45,20 @@ func (p *ProviderRequest) MarshalJSON() ([]byte, error) {
 			"method":  p.Method,
 			"path":    p.Path,
 			"query":   p.Query,
-			"headers": p.Headers,
+			"headers": getHeaderWithSingleValues(p.Headers),
 		})
 	}
 
+}
+
+func getHeaderWithSingleValues(headers http.Header) map[string]string {
+	if headers == nil {
+		return nil
+	}
+
+	h := make(map[string]string)
+	for header, val := range headers {
+		h[header] = val[0]
+	}
+	return h
 }

@@ -11,7 +11,7 @@ func Test_ValidPact_ShouldWritePactFile(t *testing.T) {
 	var interactions []*consumer.Interaction
 	interactions = append(interactions, getFakeInteraction())
 
-	pact := NewPact("consumer", "provider", interactions)
+	pact := NewPactFile("consumer", "provider", interactions)
 	writer := NewPactFileWriter(pact, "./example")
 
 	if err := writer.Write(); err != nil {

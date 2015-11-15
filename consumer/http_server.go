@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 )
 
-type httpMockService struct {
+type HttpMockService struct {
 	server       *httptest.Server
 	interactions []*Interaction
 }
@@ -16,11 +16,11 @@ var (
 	notFoundError = errors.New("No matching interaction found.")
 )
 
-func newHttpMockService() *httpMockService {
-	return &httpMockService{interactions: make([]*Interaction, 0)}
+func NewHttpMockService() *HttpMockService {
+	return &HttpMockService{interactions: make([]*Interaction, 0)}
 }
 
-func (ms *httpMockService) Start() string {
+func (ms *HttpMockService) Start() string {
 	if ms.server == nil {
 		ms.server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -37,22 +37,22 @@ func (ms *httpMockService) Start() string {
 	return ms.server.URL
 }
 
-func (ms *httpMockService) Stop() {
+func (ms *HttpMockService) Stop() {
 	if ms.server != nil {
 		ms.server.Close()
 	}
 }
 
-func (ms *httpMockService) RegisterInteraction(interaction *Interaction) {
+func (ms *HttpMockService) RegisterInteraction(interaction *Interaction) {
 	ms.interactions = append(ms.interactions, interaction)
 }
 
-func (ms *httpMockService) ClearInteractions() {
+func (ms *HttpMockService) ClearInteractions() {
 	ms.interactions = nil
 	ms.interactions = make([]*Interaction, 0)
 }
 
-func (ms *httpMockService) findMatchingInteraction(r *http.Request, interactions []*Interaction) (*Interaction, error) {
+func (ms *HttpMockService) findMatchingInteraction(r *http.Request, interactions []*Interaction) (*Interaction, error) {
 
 	for i := range interactions {
 		req, err := interactions[i].ToHttpRequest(ms.server.URL)

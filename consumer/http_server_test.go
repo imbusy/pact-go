@@ -10,7 +10,7 @@ import (
 )
 
 func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
-	mockHttpServer := newHttpMockService()
+	mockHttpServer := NewHttpMockService()
 	interaction := getFakeInteraction()
 	mockHttpServer.ClearInteractions()
 	mockHttpServer.RegisterInteraction(interaction)
@@ -48,7 +48,7 @@ func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
 }
 
 func Test_MatchingInteractionNotFound_Returns404(t *testing.T) {
-	mockHttpServer := newHttpMockService()
+	mockHttpServer := NewHttpMockService()
 	interaction := getFakeInteraction()
 
 	url := mockHttpServer.Start()

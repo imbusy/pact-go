@@ -1,6 +1,7 @@
-package consumer
+package pact
 
 import (
+	"github.com/bennycao/pact-go/consumer"
 	"github.com/bennycao/pact-go/provider"
 )
 
@@ -21,11 +22,11 @@ type MockProviderService struct {
 	providerResponse *provider.ProviderResponse
 	state            string
 	description      string
-	service          *httpMockService
+	service          *consumer.HttpMockService
 }
 
 func NewMockProviderService(config *PactConfig) *MockProviderService {
-	return &MockProviderService{service: newHttpMockService()}
+	return &MockProviderService{service: consumer.NewHttpMockService()}
 }
 
 func (p *MockProviderService) Given(state string) ProviderService {
@@ -62,7 +63,7 @@ func (p *MockProviderService) VerifyInteractions() error {
 }
 
 func (p *MockProviderService) registerInteraction() {
-	interaction := NewInteraction(p.description, p.state, p.providerRequest, p.providerResponse)
+	interaction := consumer.NewInteraction(p.description, p.state, p.providerRequest, p.providerResponse)
 	p.service.RegisterInteraction(interaction)
 }
 

@@ -13,11 +13,11 @@ type PactWriter interface {
 }
 
 type PactFileWriter struct {
-	pact     *Pact
+	pact     *PactFile
 	pactPath string
 }
 
-func NewPactFileWriter(pact *Pact, path string) PactWriter {
+func NewPactFileWriter(pact *PactFile, path string) PactWriter {
 	return &PactFileWriter{
 		pact:     pact,
 		pactPath: path,

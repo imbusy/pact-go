@@ -1,4 +1,4 @@
-package consumer
+package pact
 
 type PactBuilder interface {
 	ServiceConsumer(consumer string) PactBuilder

@@ -1,11 +1,11 @@
 package consumer
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/bennycao/pact-go/provider"
 	"net/http/httptest"
 	"net/url"
-	"reflect"
 	"testing"
 )
 
@@ -49,16 +49,6 @@ func Test_ValidRequest_MapsToHttpRequest(t *testing.T) {
 	}
 }
 
-func Test_BodyIsNotJson_ReturnsError(t *testing.T) {
-	interaction := getFakeInteraction()
-	interaction.Response.Body = "not json"
-	rec := httptest.NewRecorder()
-
-	if err := interaction.WriteToHttpResponse(rec); err == nil {
-		t.Error("Expected to throw error")
-	}
-}
-
 func Test_ValidResponse_WritesToHttpResponse(t *testing.T) {
 	interaction := getFakeInteraction()
 	rec := httptest.NewRecorder()
@@ -76,11 +66,16 @@ func Test_ValidResponse_WritesToHttpResponse(t *testing.T) {
 		}
 	}
 
-	expectedObj, _ := getJsonObj(interaction.Response.Body)
-	actualObj, _ := getJsonObj(rec.Body.String())
+	expectedObj, err := interaction.Response.GetBody()
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
 
-	if !reflect.DeepEqual(expectedObj, actualObj) {
-		t.Errorf("Expected body %s \r\n but recieved %s", interaction.Response.Body, rec.Body.String())
+	actualObj := rec.Body.Bytes()
+
+	if bytes.Compare(expectedObj, actualObj) != 0 {
+		t.Error("Expected body is different from the recieved body")
 	}
 }
 

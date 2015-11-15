@@ -1,11 +1,10 @@
 package consumer
 
 import (
-	"encoding/json"
+	"bytes"
 	"github.com/bennycao/pact-go/provider"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -33,23 +32,19 @@ func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
 	}
 
 	defer resp.Body.Close()
-	var expectedBody, actualBody interface{}
 
-	if err := json.Unmarshal([]byte(interaction.Response.Body), &expectedBody); err != nil {
+	if expectedBody, err := interaction.Response.GetBody(); err != nil {
 		t.Error(err)
-		t.FailNow()
+	} else {
+		if actualBody, err := ioutil.ReadAll(resp.Body); err != nil {
+			t.Error(err)
+		} else {
+			if bytes.Compare(expectedBody, actualBody) != 0 {
+				t.Error("The response body does not match")
+			}
+		}
 	}
 
-	decoder := json.NewDecoder(resp.Body)
-
-	if err := decoder.Decode(&actualBody); err != nil {
-		t.Error(err)
-		t.FailNow()
-	}
-
-	if !reflect.DeepEqual(expectedBody, actualBody) {
-		t.Error("The response body is does not match")
-	}
 }
 
 func Test_MatchingInteractionNotFound_Returns404(t *testing.T) {
@@ -89,13 +84,10 @@ func getFakeInteraction() *Interaction {
 	header := make(http.Header)
 	header.Add("content-type", "application/json")
 	i := &Interaction{
-		Request: provider.NewProviderRequest("GET", "/", "param=xyzmk", header),
-		Response: &provider.ProviderResponse{
-			Status:  201,
-			Headers: header,
-			Body:    `{"result": true}`,
-		},
+		Request:  provider.NewProviderRequest("GET", "/", "param=xyzmk", header),
+		Response: provider.NewProviderResponse(201, header),
 	}
 	i.Request.SetBody(`{ "firstName": "John", "lastName": "Doe" }`)
+
 	return i
 }

@@ -2,7 +2,6 @@ package consumer
 
 import (
 	"bytes"
-	"encoding/json"
 	"github.com/bennycao/pact-go/provider"
 	"io"
 	"net/http"
@@ -10,10 +9,10 @@ import (
 )
 
 type Interaction struct {
-	State       string
-	Description string
-	Request     *provider.ProviderRequest
-	Response    *provider.ProviderResponse
+	State       string                    `json:"state"`
+	Description string                    `json:"description"`
+	Request     *prvider.ProviderRequest  `json:"request"`
+	Response    *povider.ProviderResponse `json:"response"`
 }
 
 func NewInteraction(state string, description string, request *provider.ProviderRequest,
@@ -61,14 +60,12 @@ func (i *Interaction) WriteToHttpResponse(w http.ResponseWriter) error {
 		respHeader.Add(header, val[0])
 	}
 
-	if i.Response.Body != "" {
-		var body interface{}
-		if err := json.Unmarshal([]byte(i.Response.Body), &body); err != nil {
-			return err
+	if body, err := i.Response.GetBody(); err != nil {
+		return err
+	} else if body != nil {
+		if _, writeErr := w.Write(body); writeErr != nil {
+			return writeErr
 		}
-
-		encoder := json.NewEncoder(w)
-		encoder.Encode(body)
 	}
 	return nil
 }

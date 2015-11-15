@@ -1,22 +1,23 @@
 package consumer
 
 import (
+	"bytes"
 	"encoding/json"
+	"github.com/bennycao/pact-go/provider"
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type Interaction struct {
 	State       string
 	Description string
-	Request     *ProviderRequest
-	Response    *ProviderResponse
+	Request     *provider.ProviderRequest
+	Response    *provider.ProviderResponse
 }
 
-func NewInteraction(state string, description string, request *ProviderRequest,
-	response *ProviderResponse) *Interaction {
+func NewInteraction(state string, description string, request *provider.ProviderRequest,
+	response *provider.ProviderResponse) *Interaction {
 	return &Interaction{
 		State:       state,
 		Description: description,
@@ -33,7 +34,12 @@ func (i *Interaction) ToHttpRequest(baseUrl string) (*http.Request, error) {
 	u.Path = i.Request.Path
 	u.RawQuery = i.Request.Query
 
-	bodyReader := getBodyReader(i.Request.Body)
+	body, err := i.Request.GetBody()
+	if err != nil {
+		return nil, err
+	}
+
+	bodyReader := getReader(body)
 	req, err := http.NewRequest(i.Request.Method, u.String(), bodyReader)
 
 	if err != nil {
@@ -67,9 +73,9 @@ func (i *Interaction) WriteToHttpResponse(w http.ResponseWriter) error {
 	return nil
 }
 
-func getBodyReader(params string) io.Reader {
-	if params != "" {
-		return strings.NewReader(params)
+func getReader(content []byte) io.Reader {
+	if content != nil {
+		return bytes.NewReader(content)
 	}
 	return nil
 }

@@ -2,6 +2,7 @@ package consumer
 
 import (
 	"encoding/json"
+	"github.com/bennycao/pact-go/provider"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -87,18 +88,14 @@ func Test_MatchingInteractionNotFound_Returns404(t *testing.T) {
 func getFakeInteraction() *Interaction {
 	header := make(http.Header)
 	header.Add("content-type", "application/json")
-	return &Interaction{
-		Request: &ProviderRequest{
-			Method:  "GET",
-			Path:    "/",
-			Query:   "param=xyzmk",
-			Body:    `{ "firstName": "John", "lastName": "Doe" }`,
-			Headers: header,
-		},
-		Response: &ProviderResponse{
+	i := &Interaction{
+		Request: provider.NewProviderRequest("GET", "/", "param=xyzmk", header),
+		Response: &provider.ProviderResponse{
 			Status:  201,
 			Headers: header,
 			Body:    `{"result": true}`,
 		},
 	}
+	i.Request.SetBody(`{ "firstName": "John", "lastName": "Doe" }`)
+	return i
 }

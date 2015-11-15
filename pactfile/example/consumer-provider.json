@@ -1,0 +1,38 @@
+{
+	"consumer": {
+		"name": "consumer"
+	},
+	"provider": {
+		"name": "provider"
+	},
+	"interactions": [
+		{
+			"provider_state": "some state",
+			"description": "description of the interaction",
+			"request": {
+				"body": {
+					"firstName": "John",
+					"lastName": "Doe"
+				},
+				"headers": {
+					"Content-Type": "application/json"
+				},
+				"method": "POST",
+				"path": "/",
+				"query": "param=xyzmk"
+			},
+			"response": {
+				"body": {
+					"result": true
+				},
+				"headers": {
+					"Content-Type": "application/json"
+				},
+				"status": 201
+			}
+		}
+	],
+	"metaData": {
+		"pactSpecification": "1.1.0"
+	}
+}

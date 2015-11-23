@@ -56,8 +56,8 @@ func Test_ExpectedNoBodyButActualRequestHasBody_WillMatch(t *testing.T) {
 }
 
 func Test_BodyIsDifferent_WillNotMatch(t *testing.T) {
-	a, err := http.NewRequest("GET", "/test", strings.NewReader(`{"name": "Jane"}`))
-	b, err := http.NewRequest("GET", "/test", strings.NewReader(`{"name": "John"}`))
+	a, err := http.NewRequest("GET", "/test", strings.NewReader(`{"name": "John"}`))
+	b, err := http.NewRequest("GET", "/test", strings.NewReader(`{"name": "John", "age": 12 }`))
 
 	result, err := MatchRequest(a, b)
 

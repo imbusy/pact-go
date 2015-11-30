@@ -1,70 +1,20 @@
 package comparers
 
 import (
-	"encoding/json"
-	"io"
 	"net/http"
-	"net/url"
-	"reflect"
-	"strings"
 )
 
 func MatchRequest(expected, actual *http.Request) (bool, error) {
-	if !methodMatches(expected.Method, actual.Method) ||
-		!urlMatches(expected.URL, actual.URL) ||
-		!containsAllHeaders(expected.Header, actual.Header) {
-
+	if !methodMatches(expected.Method, actual.Method) {
 		return false, nil
-	}
-
-	return bodyMatches(expected.Body, actual.Body)
-}
-
-func methodMatches(expected, actual string) bool {
-	return strings.EqualFold(expected, actual)
-}
-
-func urlMatches(expected, actual *url.URL) bool {
-
-	return strings.EqualFold(expected.Path, actual.Path) && strings.EqualFold(expected.RawQuery, actual.RawQuery)
-}
-
-func containsAllHeaders(expected, actual map[string][]string) bool {
-	if len(expected) > len(actual) {
-		return false
-	}
-
-	for key, val := range expected {
-		if !strings.EqualFold(val[0], actual[key][0]) {
-			return false
-		}
-	}
-	return true
-}
-
-func bodyMatches(expected, actual io.ReadCloser) (bool, error) {
-	if expected == nil {
-		return true, nil
-	}
-
-	var e, a interface{}
-	decoder := json.NewDecoder(expected)
-	err := decoder.Decode(&e)
-	if err != nil {
+	} else if !pathMatches(expected.URL.Path, actual.URL.Path) {
+		return false, nil
+	} else if res, _ := queryMatches(expected.URL.Query(), actual.URL.Query()); !res {
+		return false, nil
+	} else if res, _ := headerMatches(expected.Header, actual.Header); !res {
+		return false, nil
+	} else if res, _, err := bodyMatches(expected.Body, actual.Body); !res {
 		return false, err
 	}
-
-	decoder = json.NewDecoder(actual)
-	err = decoder.Decode(&a)
-	if err != nil {
-		return false, err
-	}
-
-	expectedVal := e.(map[string]interface{})
-	if expectedVal == nil {
-		return true, nil
-	}
-
-	actualVal := a.(map[string]interface{})
-	return reflect.DeepEqual(expectedVal, actualVal), nil
+	return true, nil
 }

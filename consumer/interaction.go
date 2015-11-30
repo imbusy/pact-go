@@ -33,7 +33,7 @@ func (i *Interaction) ToHttpRequest(baseUrl string) (*http.Request, error) {
 	u.Path = i.Request.Path
 	u.RawQuery = i.Request.Query
 
-	body, err := i.Request.GetBody()
+	body, err := i.Request.GetData()
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (i *Interaction) WriteToHttpResponse(w http.ResponseWriter) error {
 		respHeader.Add(header, val[0])
 	}
 
-	if body, err := i.Response.GetBody(); err != nil {
+	if body, err := i.Response.GetData(); err != nil {
 		return err
 	} else if body != nil {
 		if _, writeErr := w.Write(body); writeErr != nil {

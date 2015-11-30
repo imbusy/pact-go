@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func Test_MethodIsDifferen_WillNotMatch(t *testing.T) {
+func Test_MethodIsDifferent_WillNotMatch(t *testing.T) {
 	a, _ := http.NewRequest("GET", "", nil)
 	b, _ := http.NewRequest("POST", "", nil)
 
@@ -56,19 +56,18 @@ func Test_ExpectedNoBodyButActualRequestHasBody_WillMatch(t *testing.T) {
 }
 
 func Test_BodyIsDifferent_WillNotMatch(t *testing.T) {
-	a, err := http.NewRequest("GET", "/test", strings.NewReader(`{"name": "Jane"}`))
+	a, err := http.NewRequest("GET", "/test", strings.NewReader(`{"name": "John", "age": 12 }`))
 	b, err := http.NewRequest("GET", "/test", strings.NewReader(`{"name": "John"}`))
 
 	result, err := MatchRequest(a, b)
-
-	if err != nil {
-		t.Error(err)
-		t.FailNow()
-	}
-
 	if result {
 		t.Error("The request should not match")
 	}
+
+	if err != nil {
+		t.Error(err)
+	}
+
 }
 
 func Test_HeadersAreMissing_WillNotMatch(t *testing.T) {

@@ -3,11 +3,13 @@ package diff
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"unsafe"
 )
 
 var (
-	rootPath = "$root"
+	rootPath      = "$root"
+	DefaultConfig = &DiffConfig{AllowUnexpectedKeys: true}
 )
 
 // During deepValueEqual, must keep track of checks that are
@@ -20,16 +22,32 @@ type visit struct {
 	typ reflect.Type
 }
 
-type differences []*mismatch
+type DiffConfig struct {
+	AllowUnexpectedKeys bool
+}
 
-func (d *differences) Append(m *mismatch) {
+type Differences []*Mismatch
+
+func (d *Differences) Append(m *Mismatch) {
 	*d = append(*d, m)
+}
+
+func (d *Differences) toString() []string {
+	s := make([]string, len(*d))
+	for _, m := range *d {
+		s = append(s, fmt.Sprint(m))
+	}
+	return s
+}
+
+func (d Differences) Error() string {
+	return strings.Join(d.toString(), "\n")
 }
 
 // Tests for deep equality using reflected types. The map argument tracks
 // comparisons that have already been seen, which allows short circuiting on
 // recursive types.
-func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, depth int, d *differences) (ok bool) {
+func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, depth int, d *Differences, conf *DiffConfig) (ok bool) {
 	mismatchf := func(typ mismatchType, a ...interface{}) {
 		d.Append(newMismatch(v1, v2, path, typ, a...))
 	}
@@ -93,7 +111,7 @@ func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, d
 		for i := 0; i < v1.Len(); i++ {
 			if ok := deepValueEqual(
 				fmt.Sprintf("%s[%d]", path, i),
-				v1.Index(i), v2.Index(i), visited, depth+1, d); !ok {
+				v1.Index(i), v2.Index(i), visited, depth+1, d, conf); !ok {
 				return false
 			}
 		}
@@ -110,7 +128,7 @@ func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, d
 		for i := 0; i < v1.Len(); i++ {
 			if ok := deepValueEqual(
 				fmt.Sprintf("%s[%d]", path, i),
-				v1.Index(i), v2.Index(i), visited, depth+1, d); !ok {
+				v1.Index(i), v2.Index(i), visited, depth+1, d, conf); !ok {
 				return false
 			}
 		}
@@ -123,10 +141,17 @@ func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, d
 			}
 			return true
 		}
-		return deepValueEqual(path, v1.Elem(), v2.Elem(), visited, depth+1, d)
+		return deepValueEqual(path, v1.Elem(), v2.Elem(), visited, depth+1, d, conf)
 	case reflect.Ptr:
-		return deepValueEqual("(*"+path+")", v1.Elem(), v2.Elem(), visited, depth+1, d)
+		return deepValueEqual("(*"+path+")", v1.Elem(), v2.Elem(), visited, depth+1, d, conf)
 	case reflect.Struct:
+		if v1.NumField() > v2.NumField() {
+			mismatchf(mLen, v1.NumField(), v2.NumField())
+		} else if v2.NumField() > v1.NumField() && conf.AllowUnexpectedKeys == false {
+			mismatchf(mLen, v1.NumField(), v2.NumField())
+			return false
+		}
+
 		result := true
 		for i, n := 0, v1.NumField(); i < n; i++ {
 			fieldName := v1.Type().Field(i).Name
@@ -143,7 +168,7 @@ func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, d
 			if fieldNotFound {
 				mismatchf(mFieldNotFound, path)
 				result = false
-			} else if ok := deepValueEqual(path, v1.Field(i), v2.Field(i), visited, depth+1, d); !ok {
+			} else if ok := deepValueEqual(path, v1.Field(i), v2.Field(i), visited, depth+1, d, conf); !ok {
 				result = false
 			}
 		}
@@ -155,8 +180,11 @@ func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, d
 		}
 		if v1.Len() > v2.Len() {
 			mismatchf(mLen, v1.Len(), v2.Len())
+		} else if v2.Len() > v1.Len() && conf.AllowUnexpectedKeys == false {
+			mismatchf(mLen, v1.Len(), v2.Len())
 			return false
 		}
+
 		if v1.Pointer() == v2.Pointer() {
 			return true
 		}
@@ -182,7 +210,7 @@ func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, d
 			if keyFound == nil {
 				mismatchf(mKeyNotFound, p)
 				result = false
-			} else if ok := deepValueEqual(p, v1.MapIndex(v1k), v2.MapIndex(v1k), visited, depth+1, d); !ok {
+			} else if ok := deepValueEqual(p, v1.MapIndex(v1k), v2.MapIndex(v1k), visited, depth+1, d, conf); !ok {
 				result = false
 			}
 		}
@@ -251,8 +279,12 @@ func deepValueEqual(path string, v1, v2 reflect.Value, visited map[visit]bool, d
 // equal to a nil slice. Additional fileds/keys from structs/maps of a2
 // are not treated as mismatch as this matching needs to be loose for
 // non
-func DeepDiff(a1, a2 interface{}) (bool, differences) {
-	var d differences
+func DeepDiff(a1, a2 interface{}, conf *DiffConfig) (bool, Differences) {
+	var d Differences
+	if conf == nil {
+		conf = DefaultConfig
+	}
+
 	mismatchf := func(typ mismatchType, a ...interface{}) {
 		d.Append(newMismatch(reflect.ValueOf(a1), reflect.ValueOf(a2), rootPath, typ, a...))
 	}
@@ -267,7 +299,7 @@ func DeepDiff(a1, a2 interface{}) (bool, differences) {
 	v1 := reflect.ValueOf(a1)
 	v2 := reflect.ValueOf(a2)
 
-	return deepValueEqual(rootPath, v1, v2, make(map[visit]bool), 0, &d), d
+	return deepValueEqual(rootPath, v1, v2, make(map[visit]bool), 0, &d, conf), d
 }
 
 // interfaceOf returns v.Interface() even if v.CanInterface() == false.

@@ -7,7 +7,7 @@ import (
 
 type mismatchType int
 
-type mismatch struct {
+type Mismatch struct {
 	v1, v2 reflect.Value
 	path   string
 	how    string
@@ -28,13 +28,13 @@ const (
 )
 
 var (
-	diffMsg       = "mismatch at %s: %s \nexpected: \n\t%#v \nobtained \n\t%#v"
+	diffMsg       = "mismatch at %s: %s \nexpected: \n\t%#v \nrecieved \n\t%#v"
 	diffMsgReason = "mismatch at %s: %s"
 )
 
 var typeMsgs = map[mismatchType]string{
-	mType:            "type mismatch %s vs %s",
-	mLen:             "length mismatch, %d vs %d",
+	mType:            "type mismatch expected %s recieved %s",
+	mLen:             "length mismatch, expected %d recieved %d",
 	mUnequal:         "unequal",
 	mValidty:         "validity mismatch",
 	mFieldUnexpected: "unexpected field %s",
@@ -45,8 +45,8 @@ var typeMsgs = map[mismatchType]string{
 	mNonNilFunc:      "non-nil functions",
 }
 
-func newMismatch(v1, v2 reflect.Value, path string, typ mismatchType, typMsgArgs ...interface{}) *mismatch {
-	return &mismatch{
+func newMismatch(v1, v2 reflect.Value, path string, typ mismatchType, typMsgArgs ...interface{}) *Mismatch {
+	return &Mismatch{
 		v1:   v1,
 		v2:   v2,
 		path: path,
@@ -55,10 +55,10 @@ func newMismatch(v1, v2 reflect.Value, path string, typ mismatchType, typMsgArgs
 	}
 }
 
-func (m *mismatch) String() string {
+func (m *Mismatch) String() string {
 	return fmt.Sprintf(diffMsg, m.path, m.how, interfaceOf(m.v1), interfaceOf(m.v2))
 }
 
-func (m *mismatch) Reason() string {
+func (m *Mismatch) Reason() string {
 	return fmt.Sprintf(diffMsgReason, m.path, m.how)
 }

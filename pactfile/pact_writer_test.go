@@ -34,8 +34,8 @@ func getFakeInteraction() *consumer.Interaction {
 	header.Add("content-type", "application/json")
 	i := consumer.NewInteraction("description of the interaction",
 		"some state",
-		provider.NewProviderRequest("POST", "/", "param=xyzmk", header),
-		provider.NewProviderResponse(201, header))
+		provider.NewJsonProviderRequest("POST", "/", "param=xyzmk", header),
+		provider.NewJsonProviderResponse(201, header))
 
 	i.Request.SetBody(`{ "firstName": "John", "lastName": "Doe" }`)
 	i.Response.SetBody(`{"result": true}`)

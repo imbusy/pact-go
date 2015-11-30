@@ -8,18 +8,34 @@ import (
 	"strings"
 )
 
+type HttpContent interface {
+	GetData() ([]byte, error)
+	GetBody() interface{}
+	SetBody(content interface{}) error
+}
+
 type jsonContent struct {
 	data      map[string]interface{}
 	sliceData []interface{}
 }
 
-func (c *jsonContent) GetBody() ([]byte, error) {
+func (c *jsonContent) GetData() ([]byte, error) {
 	if len(c.data) > 0 {
 		return json.Marshal(c.data)
 	} else if len(c.sliceData) > 0 {
 		return json.Marshal(c.sliceData)
 	} else {
 		return nil, nil
+	}
+}
+
+func (c *jsonContent) GetBody() interface{} {
+	if len(c.data) > 0 {
+		return c.data
+	} else if len(c.sliceData) > 0 {
+		return c.sliceData
+	} else {
+		return nil
 	}
 }
 

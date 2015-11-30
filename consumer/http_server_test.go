@@ -36,7 +36,7 @@ func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
 
 	defer resp.Body.Close()
 
-	if expectedBody, err := interaction.Response.GetBody(); err != nil {
+	if expectedBody, err := interaction.Response.GetData(); err != nil {
 		t.Error(err)
 	} else {
 		if actualBody, err := ioutil.ReadAll(resp.Body); err != nil {
@@ -88,8 +88,8 @@ func getFakeInteraction() *Interaction {
 	header.Add("content-type", "application/json")
 	i := NewInteraction("description of the interaction",
 		"some state",
-		provider.NewProviderRequest("GET", "/", "param=xyzmk", header),
-		provider.NewProviderResponse(201, header))
+		provider.NewJsonProviderRequest("GET", "/", "param=xyzmk", header),
+		provider.NewJsonProviderResponse(201, header))
 	i.Request.SetBody(`{ "firstName": "John", "lastName": "Doe" }`)
 
 	return i

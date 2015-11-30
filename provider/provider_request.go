@@ -10,35 +10,28 @@ type ProviderRequest struct {
 	Path    string
 	Query   string
 	Headers http.Header
-	*jsonContent
+	HttpContent
 }
 
-func NewProviderRequest(method, path, query string, headers http.Header) *ProviderRequest {
+func NewJsonProviderRequest(method, path, query string, headers http.Header) *ProviderRequest {
 	return &ProviderRequest{
 		Method:      method,
 		Path:        path,
 		Query:       query,
 		Headers:     headers,
-		jsonContent: &jsonContent{},
+		HttpContent: &jsonContent{},
 	}
 }
 
 func (p *ProviderRequest) MarshalJSON() ([]byte, error) {
-	if len(p.data) > 0 {
+	body := p.GetBody()
+	if body != nil {
 		return json.Marshal(map[string]interface{}{
 			"method":  p.Method,
 			"path":    p.Path,
 			"query":   p.Query,
 			"headers": getHeaderWithSingleValues(p.Headers),
-			"body":    p.data,
-		})
-	} else if len(p.sliceData) > 0 {
-		return json.Marshal(map[string]interface{}{
-			"method":  p.Method,
-			"path":    p.Path,
-			"query":   p.Query,
-			"headers": getHeaderWithSingleValues(p.Headers),
-			"body":    p.sliceData,
+			"body":    body,
 		})
 	} else {
 		return json.Marshal(map[string]interface{}{

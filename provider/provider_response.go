@@ -8,29 +8,25 @@ import (
 type ProviderResponse struct {
 	Status  int
 	Headers http.Header
-	*jsonContent
+	HttpContent
 }
 
-func NewProviderResponse(status int, headers http.Header) *ProviderResponse {
+func NewJsonProviderResponse(status int, headers http.Header) *ProviderResponse {
 	return &ProviderResponse{
 		Status:      status,
 		Headers:     headers,
-		jsonContent: &jsonContent{},
+		HttpContent: &jsonContent{},
 	}
 }
 
 func (p *ProviderResponse) MarshalJSON() ([]byte, error) {
-	if len(p.data) > 0 {
+	body := p.GetBody()
+
+	if body != nil {
 		return json.Marshal(map[string]interface{}{
 			"status":  p.Status,
 			"headers": getHeaderWithSingleValues(p.Headers),
-			"body":    p.data,
-		})
-	} else if len(p.sliceData) > 0 {
-		return json.Marshal(map[string]interface{}{
-			"status":  p.Status,
-			"headers": getHeaderWithSingleValues(p.Headers),
-			"body":    p.sliceData,
+			"body":    body,
 		})
 	} else {
 		return json.Marshal(map[string]interface{}{

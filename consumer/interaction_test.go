@@ -66,7 +66,7 @@ func Test_ValidResponse_WritesToHttpResponse(t *testing.T) {
 		}
 	}
 
-	expectedObj, err := interaction.Response.GetBody()
+	expectedObj, err := interaction.Response.GetData()
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

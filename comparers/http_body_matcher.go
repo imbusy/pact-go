@@ -2,33 +2,31 @@ package comparers
 
 import (
 	"encoding/json"
+	"github.com/bennycao/pact-go/diff"
 	"io"
-	"reflect"
 )
 
-func bodyMatches(expected, actual io.ReadCloser) (bool, error) {
+func bodyMatches(expected, actual io.ReadCloser) (bool, diff.Differences, error) {
 	if expected == nil {
-		return true, nil
+		return true, nil, nil
 	}
 
 	var e, a interface{}
 	decoder := json.NewDecoder(expected)
 	err := decoder.Decode(&e)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
 	decoder = json.NewDecoder(actual)
 	err = decoder.Decode(&a)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
-	expectedVal := e.(map[string]interface{})
-	if expectedVal == nil {
-		return true, nil
+	if result, diffs := diff.DeepDiff(e, a, diff.DefaultConfig); result {
+		return result, nil, nil
+	} else {
+		return result, diffs, nil
 	}
-
-	actualVal := a.(map[string]interface{})
-	return reflect.DeepEqual(expectedVal, actualVal), nil
 }

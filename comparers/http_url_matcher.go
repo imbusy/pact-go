@@ -1,29 +1,17 @@
 package comparers
 
 import (
+	"github.com/bennycao/pact-go/diff"
 	"net/url"
 )
 
 func pathMatches(expected, actual string) bool {
-	return expected == actual
-}
-
-func queryMatches(expected, actual url.Values) bool {
-	if len(expected) != len(actual) {
+	if expected != actual {
 		return false
 	}
-
-	for key, evals := range expected {
-		avals := actual[key]
-		if len(evals) != len(avals) {
-			return false
-		}
-
-		for i := 0; i < len(evals); i++ {
-			if evals[i] != avals[i] {
-				return false
-			}
-		}
-	}
 	return true
+}
+
+func queryMatches(expected, actual url.Values) (bool, diff.Differences) {
+	return diff.DeepDiff(expected, actual, &diff.DiffConfig{AllowUnexpectedKeys: false})
 }

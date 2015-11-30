@@ -28,6 +28,9 @@ func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
 
 	if resp.StatusCode != interaction.Response.Status {
 		t.Errorf("The response status is %s, expected %v", resp.Status, interaction.Response.Status)
+		contents, _ := ioutil.ReadAll(resp.Body)
+		t.Log(string(contents))
+
 		t.FailNow()
 	}
 

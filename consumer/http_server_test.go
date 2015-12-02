@@ -2,20 +2,21 @@ package consumer
 
 import (
 	"bytes"
-	"github.com/bennycao/pact-go/provider"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/bennycao/pact-go/provider"
 )
 
 func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
-	mockHttpServer := NewHttpMockService()
+	mockHTTPServer := NewHTTPMockService()
 	interaction := getFakeInteraction()
-	mockHttpServer.ClearInteractions()
-	mockHttpServer.RegisterInteraction(interaction)
-	url := mockHttpServer.Start()
-	defer mockHttpServer.Stop()
+	mockHTTPServer.ClearInteractions()
+	mockHTTPServer.RegisterInteraction(interaction)
+	url := mockHTTPServer.Start()
+	defer mockHTTPServer.Stop()
 
 	client := &http.Client{}
 
@@ -44,6 +45,10 @@ func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
 		} else {
 			if bytes.Compare(expectedBody, actualBody) != 0 {
 				t.Error("The response body does not match")
+			} else {
+				if err := mockHTTPServer.VerifyInteractions(); err != nil {
+					t.Errorf("expected verfication to pass, got error: %s", err.Error())
+				}
 			}
 		}
 	}
@@ -51,11 +56,11 @@ func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
 }
 
 func Test_MatchingInteractionNotFound_Returns404(t *testing.T) {
-	mockHttpServer := NewHttpMockService()
+	mockHTTPServer := NewHTTPMockService()
 	interaction := getFakeInteraction()
 
-	url := mockHttpServer.Start()
-	defer mockHttpServer.Stop()
+	url := mockHTTPServer.Start()
+	defer mockHTTPServer.Stop()
 
 	client := &http.Client{}
 
@@ -78,8 +83,8 @@ func Test_MatchingInteractionNotFound_Returns404(t *testing.T) {
 		t.Error(err)
 	}
 
-	if bodyText != notFoundError.Error() {
-		t.Errorf("The expected response was '%s' but recieved '%s'", notFoundError.Error(), bodyText)
+	if bodyText != errNotFound.Error() {
+		t.Errorf("The expected response was '%s' but recieved '%s'", errNotFound.Error(), bodyText)
 	}
 }
 

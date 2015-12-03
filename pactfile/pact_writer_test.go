@@ -22,7 +22,7 @@ func Test_ValidPact_ShouldWritePactFile(t *testing.T) {
 	interactions = append(interactions, getFakeInteraction())
 
 	pact := NewPactFile("consumer", "provider", interactions)
-	writer := NewPactFileWriter(pact, "./example")
+	writer := NewPactFileWriter(pact, "../pact_examples")
 
 	if err := writer.Write(); err != nil {
 		t.Error(err)

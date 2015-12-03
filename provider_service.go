@@ -10,8 +10,8 @@ import (
 type ProviderService interface {
 	Given(state string) ProviderService
 	UponReceiving(description string) ProviderService
-	With(request *provider.ProviderRequest) ProviderService
-	WillRespondWith(response *provider.ProviderResponse) ProviderService
+	With(request provider.ProviderRequest) ProviderService
+	WillRespondWith(response provider.ProviderResponse) ProviderService
 	ClearInteractions() ProviderService
 	VerifyInteractions() error
 }
@@ -39,13 +39,13 @@ func (p *mockProviderService) UponReceiving(description string) ProviderService 
 	return p
 }
 
-func (p *mockProviderService) With(providerRequest *provider.ProviderRequest) ProviderService {
-	p.providerRequest = providerRequest
+func (p *mockProviderService) With(providerRequest provider.ProviderRequest) ProviderService {
+	p.providerRequest = &providerRequest
 	return p
 }
 
-func (p *mockProviderService) WillRespondWith(providerResponse *provider.ProviderResponse) ProviderService {
-	p.providerResponse = providerResponse
+func (p *mockProviderService) WillRespondWith(providerResponse provider.ProviderResponse) ProviderService {
+	p.providerResponse = &providerResponse
 	p.registerInteraction()
 	return p
 }

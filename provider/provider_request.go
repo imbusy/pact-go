@@ -14,6 +14,14 @@ type ProviderRequest struct {
 }
 
 func NewJsonProviderRequest(method, path, query string, headers http.Header) *ProviderRequest {
+	if method == "" {
+		//return error
+	}
+
+	if path == "" {
+		//return error
+	}
+
 	return &ProviderRequest{
 		Method:      method,
 		Path:        path,
@@ -25,23 +33,23 @@ func NewJsonProviderRequest(method, path, query string, headers http.Header) *Pr
 
 func (p *ProviderRequest) MarshalJSON() ([]byte, error) {
 	body := p.GetBody()
-	if body != nil {
-		return json.Marshal(map[string]interface{}{
-			"method":  p.Method,
-			"path":    p.Path,
-			"query":   p.Query,
-			"headers": getHeaderWithSingleValues(p.Headers),
-			"body":    body,
-		})
-	} else {
-		return json.Marshal(map[string]interface{}{
-			"method":  p.Method,
-			"path":    p.Path,
-			"query":   p.Query,
-			"headers": getHeaderWithSingleValues(p.Headers),
-		})
+	obj := map[string]interface{}{
+		"method": p.Method,
+		"path":   p.Path,
 	}
 
+	if p.Query != "" {
+		obj["query"] = p.Query
+	}
+
+	if p.Headers != nil {
+		obj["headers"] = getHeaderWithSingleValues(p.Headers)
+	}
+
+	if body != nil {
+		obj["body"] = body
+	}
+	return json.Marshal(obj)
 }
 
 func getHeaderWithSingleValues(headers http.Header) map[string]string {

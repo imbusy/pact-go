@@ -12,7 +12,6 @@ type HttpContent interface {
 	GetData() ([]byte, error)
 	GetBody() interface{}
 	SetBody(content interface{}) error
-	Clear()
 }
 
 type jsonContent struct {
@@ -38,11 +37,6 @@ func (c *jsonContent) GetBody() interface{} {
 	} else {
 		return nil
 	}
-}
-
-func (c *jsonContent) Clear() {
-	c.data = nil
-	c.sliceData = nil
 }
 
 func (c *jsonContent) SetBody(content interface{}) error {

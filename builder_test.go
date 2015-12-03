@@ -27,7 +27,7 @@ func Test_CanBuild(t *testing.T) {
 	request.Query = "id=200"
 	response.Status = 404
 	response.Headers = nil
-	response.Clear()
+	response.ResetContent()
 
 	ps.Given("there is no user with id {200}").
 		UponReceiving("get request for user with id {200}").

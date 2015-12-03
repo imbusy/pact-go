@@ -31,8 +31,11 @@ func NewJsonProviderRequest(method, path, query string, headers http.Header) *Pr
 	}
 }
 
+func (p *ProviderRequest) ResetContent() {
+	p.HttpContent = nil
+}
+
 func (p *ProviderRequest) MarshalJSON() ([]byte, error) {
-	body := p.GetBody()
 	obj := map[string]interface{}{
 		"method": p.Method,
 		"path":   p.Path,
@@ -46,9 +49,12 @@ func (p *ProviderRequest) MarshalJSON() ([]byte, error) {
 		obj["headers"] = getHeaderWithSingleValues(p.Headers)
 	}
 
-	if body != nil {
-		obj["body"] = body
+	if p.HttpContent != nil {
+		if body := p.GetBody(); body != nil {
+			obj["body"] = body
+		}
 	}
+
 	return json.Marshal(obj)
 }
 

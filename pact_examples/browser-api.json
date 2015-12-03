@@ -15,6 +15,11 @@
 				"query": "id=23"
 			},
 			"response": {
+				"body": {
+					"firstName": "John",
+					"id": 23,
+					"lastName": "Doe"
+				},
 				"headers": {
 					"Content-Type": "application/json"
 				},

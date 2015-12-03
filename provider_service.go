@@ -22,11 +22,11 @@ type MockProviderService struct {
 	providerResponse *provider.ProviderResponse
 	state            string
 	description      string
-	service          *consumer.HttpMockService
+	service          *consumer.HTTPMockService
 }
 
 func NewMockProviderService(config *PactConfig) *MockProviderService {
-	return &MockProviderService{service: consumer.NewHttpMockService()}
+	return &MockProviderService{service: consumer.NewHTTPMockService()}
 }
 
 func (p *MockProviderService) Given(state string) ProviderService {
@@ -47,7 +47,6 @@ func (p *MockProviderService) With(providerRequest *provider.ProviderRequest) Pr
 func (p *MockProviderService) WillRespondWith(providerResponse *provider.ProviderResponse) ProviderService {
 	p.providerResponse = providerResponse
 	p.registerInteraction()
-	p.resetTransientState()
 	return p
 }
 
@@ -58,13 +57,13 @@ func (p *MockProviderService) ClearInteractions() ProviderService {
 }
 
 func (p *MockProviderService) VerifyInteractions() error {
-
-	return nil
+	return p.VerifyInteractions()
 }
 
 func (p *MockProviderService) registerInteraction() {
 	interaction := consumer.NewInteraction(p.description, p.state, p.providerRequest, p.providerResponse)
 	p.service.RegisterInteraction(interaction)
+	p.resetTransientState()
 }
 
 func (p *MockProviderService) resetTransientState() {

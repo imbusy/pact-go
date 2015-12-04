@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/bennycao/pact-go/comparers"
+	"github.com/SEEK-Jobs/pact-go/comparers"
 )
 
 type HTTPMockService struct {

@@ -2,7 +2,7 @@ package comparers
 
 import (
 	"encoding/json"
-	"github.com/bennycao/pact-go/diff"
+	"github.com/SEEK-Jobs/pact-go/diff"
 	"io"
 )
 

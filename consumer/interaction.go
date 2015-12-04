@@ -2,7 +2,7 @@ package consumer
 
 import (
 	"bytes"
-	"github.com/bennycao/pact-go/provider"
+	"github.com/SEEK-Jobs/pact-go/provider"
 	"io"
 	"net/http"
 	"net/url"

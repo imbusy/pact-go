@@ -3,7 +3,7 @@ package pactfile
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bennycao/pact-go/consumer"
+	"github.com/SEEK-Jobs/pact-go/consumer"
 )
 
 type Participant struct {

@@ -3,7 +3,7 @@ package consumer
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/bennycao/pact-go/provider"
+	"github.com/SEEK-Jobs/pact-go/provider"
 	"net/http/httptest"
 	"net/url"
 	"testing"

@@ -1,8 +1,9 @@
-package pactfile
+package writer
 
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/SEEK-Jobs/pact-go/consumer"
 )
 

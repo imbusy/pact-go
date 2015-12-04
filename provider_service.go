@@ -2,8 +2,8 @@ package pact
 
 import (
 	"github.com/SEEK-Jobs/pact-go/consumer"
-	"github.com/SEEK-Jobs/pact-go/pactfile"
 	"github.com/SEEK-Jobs/pact-go/provider"
+	"github.com/SEEK-Jobs/pact-go/writer"
 )
 
 //ProviderService - Interface to register and verify interaactions between consumer and service provider.
@@ -70,8 +70,8 @@ func (p *mockProviderService) stop() {
 }
 
 func (p *mockProviderService) persistPact(consumer, serviceProvider string) error {
-	pact := pactfile.NewPactFile(consumer, serviceProvider, p.service.GetRegisteredInteractions())
-	return pactfile.NewPactFileWriter(pact, p.config.PactPath).Write()
+	pact := writer.NewPactFile(consumer, serviceProvider, p.service.GetRegisteredInteractions())
+	return writer.NewPactFileWriter(pact, p.config.PactPath).Write()
 }
 
 func (p *mockProviderService) registerInteraction() {

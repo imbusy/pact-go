@@ -1,4 +1,4 @@
-package pactfile
+package writer
 
 import (
 	"bytes"

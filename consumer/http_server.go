@@ -43,6 +43,7 @@ func (ms *HTTPMockService) Start() string {
 func (ms *HTTPMockService) Stop() {
 	if ms.server != nil {
 		ms.server.Close()
+		ms.server = nil
 	}
 }
 
@@ -61,6 +62,11 @@ func (ms *HTTPMockService) ClearInteractions() {
 func (ms *HTTPMockService) VerifyInteractions() error {
 	return verifyInteractions(ms.interactions, ms.requestedInteractions)
 }
+
+func (ms *HTTPMockService) GetRegisteredInteractions() []*Interaction {
+	return ms.interactions
+}
+
 func (ms *HTTPMockService) findMatchingInteraction(r *http.Request, interactions []*Interaction) (*Interaction, error) {
 
 	for i := range interactions {

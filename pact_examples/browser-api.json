@@ -1,0 +1,45 @@
+{
+	"consumer": {
+		"name": "browser"
+	},
+	"provider": {
+		"name": "api"
+	},
+	"interactions": [
+		{
+			"provider_state": "there is a user with id {23}",
+			"description": "get request for user with id {23}",
+			"request": {
+				"method": "GET",
+				"path": "/user",
+				"query": "id=23"
+			},
+			"response": {
+				"body": {
+					"firstName": "John",
+					"id": 23,
+					"lastName": "Doe"
+				},
+				"headers": {
+					"Content-Type": "application/json"
+				},
+				"status": 200
+			}
+		},
+		{
+			"provider_state": "there is no user with id {200}",
+			"description": "get request for user with id {200}",
+			"request": {
+				"method": "GET",
+				"path": "/user",
+				"query": "id=200"
+			},
+			"response": {
+				"status": 404
+			}
+		}
+	],
+	"metaData": {
+		"pactSpecification": "1.1.0"
+	}
+}

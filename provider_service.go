@@ -2,71 +2,85 @@ package pact
 
 import (
 	"github.com/bennycao/pact-go/consumer"
+	"github.com/bennycao/pact-go/pactfile"
 	"github.com/bennycao/pact-go/provider"
 )
 
+//ProviderService - Interface to register and verify interaactions between consumer and service provider.
 type ProviderService interface {
 	Given(state string) ProviderService
 	UponReceiving(description string) ProviderService
-	With(request *provider.ProviderRequest) ProviderService
-	WillRespondWith(response *provider.ProviderResponse) ProviderService
+	With(request provider.ProviderRequest) ProviderService
+	WillRespondWith(response provider.ProviderResponse) ProviderService
 	ClearInteractions() ProviderService
 	VerifyInteractions() error
 }
 
-//this can be private, needs to implement the above interface
-//look into httptest package, we can create test server from there for a mock server
-
-type MockProviderService struct {
+type mockProviderService struct {
 	providerRequest  *provider.ProviderRequest
 	providerResponse *provider.ProviderResponse
 	state            string
 	description      string
 	service          *consumer.HTTPMockService
+	config           *Config
 }
 
-func NewMockProviderService(config *PactConfig) *MockProviderService {
-	return &MockProviderService{service: consumer.NewHTTPMockService()}
+func newMockProviderService(config *Config) *mockProviderService {
+	return &mockProviderService{service: consumer.NewHTTPMockService(), config: config}
 }
 
-func (p *MockProviderService) Given(state string) ProviderService {
+func (p *mockProviderService) Given(state string) ProviderService {
 	p.state = state
 	return p
 }
 
-func (p *MockProviderService) UponReceiving(description string) ProviderService {
+func (p *mockProviderService) UponReceiving(description string) ProviderService {
 	p.description = description
 	return p
 }
 
-func (p *MockProviderService) With(providerRequest *provider.ProviderRequest) ProviderService {
-	p.providerRequest = providerRequest
+func (p *mockProviderService) With(providerRequest provider.ProviderRequest) ProviderService {
+	p.providerRequest = &providerRequest
 	return p
 }
 
-func (p *MockProviderService) WillRespondWith(providerResponse *provider.ProviderResponse) ProviderService {
-	p.providerResponse = providerResponse
+func (p *mockProviderService) WillRespondWith(providerResponse provider.ProviderResponse) ProviderService {
+	p.providerResponse = &providerResponse
 	p.registerInteraction()
 	return p
 }
 
-func (p *MockProviderService) ClearInteractions() ProviderService {
+func (p *mockProviderService) ClearInteractions() ProviderService {
 	p.service.ClearInteractions()
 	p.resetTransientState()
 	return p
 }
 
-func (p *MockProviderService) VerifyInteractions() error {
+func (p *mockProviderService) VerifyInteractions() error {
 	return p.VerifyInteractions()
 }
 
-func (p *MockProviderService) registerInteraction() {
+func (p *mockProviderService) start() string {
+	return p.service.Start()
+}
+
+func (p *mockProviderService) stop() {
+	p.ClearInteractions()
+	p.service.Stop()
+}
+
+func (p *mockProviderService) persistPact(consumer, serviceProvider string) error {
+	pact := pactfile.NewPactFile(consumer, serviceProvider, p.service.GetRegisteredInteractions())
+	return pactfile.NewPactFileWriter(pact, p.config.PactPath).Write()
+}
+
+func (p *mockProviderService) registerInteraction() {
 	interaction := consumer.NewInteraction(p.description, p.state, p.providerRequest, p.providerResponse)
 	p.service.RegisterInteraction(interaction)
 	p.resetTransientState()
 }
 
-func (p *MockProviderService) resetTransientState() {
+func (p *mockProviderService) resetTransientState() {
 	p.state = ""
 	p.description = ""
 	p.providerRequest = nil

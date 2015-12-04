@@ -19,20 +19,20 @@ func NewJsonProviderResponse(status int, headers http.Header) *ProviderResponse 
 	}
 }
 
+func (p *ProviderResponse) ResetContent() {
+	p.HttpContent = nil
+}
+
 func (p *ProviderResponse) MarshalJSON() ([]byte, error) {
-	body := p.GetBody()
+	obj := map[string]interface{}{"status": p.Status}
 
-	if body != nil {
-		return json.Marshal(map[string]interface{}{
-			"status":  p.Status,
-			"headers": getHeaderWithSingleValues(p.Headers),
-			"body":    body,
-		})
-	} else {
-		return json.Marshal(map[string]interface{}{
-			"status":  p.Status,
-			"headers": getHeaderWithSingleValues(p.Headers),
-		})
+	if p.Headers != nil {
+		obj["headers"] = getHeaderWithSingleValues(p.Headers)
 	}
-
+	if p.HttpContent != nil {
+		if body := p.GetBody(); body != nil {
+			obj["body"] = body
+		}
+	}
+	return json.Marshal(obj)
 }

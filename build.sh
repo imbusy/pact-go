@@ -2,8 +2,8 @@ function saveDependencies {
 	echo "Getting dependencies"
 	go get -d .
 
-	echo "Saving dependencies"
-	$GOPATH/bin/godep save ./...
+	# echo "Saving dependencies"
+	# $GOPATH/bin/godep save ./...
 }
 
 function installGodep {
@@ -17,7 +17,7 @@ function runTests {
 	echo "Running Tests"
 	go test -v -cover ./...
 
-	
+
 }
 
 function build {
@@ -28,12 +28,12 @@ function build {
 }
 
 
-installGodep
-
-if [ $? -ne 0 ]; then
-    echo "Could not install godep"
-    exit 1
-fi
+# installGodep
+#
+# if [ $? -ne 0 ]; then
+#     echo "Could not install godep"
+#     exit 1
+# fi
 
 saveDependencies
 

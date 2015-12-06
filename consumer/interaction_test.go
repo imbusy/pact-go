@@ -11,7 +11,7 @@ import (
 )
 
 func Test_InvalidUrl_MappingToHttpRequestFails(t *testing.T) {
-	request := &provider.ProviderRequest{}
+	request := &provider.Request{}
 	interaction, _ := NewInteraction("Some State", "description", request, nil)
 	req, err := interaction.ToHttpRequest("bad.url")
 

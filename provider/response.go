@@ -5,25 +5,25 @@ import (
 	"net/http"
 )
 
-type ProviderResponse struct {
+type Response struct {
 	Status  int
 	Headers http.Header
 	HttpContent
 }
 
-func NewJsonProviderResponse(status int, headers http.Header) *ProviderResponse {
-	return &ProviderResponse{
+func NewJsonResponse(status int, headers http.Header) *Response {
+	return &Response{
 		Status:      status,
 		Headers:     headers,
 		HttpContent: &jsonContent{},
 	}
 }
 
-func (p *ProviderResponse) ResetContent() {
+func (p *Response) ResetContent() {
 	p.HttpContent = nil
 }
 
-func (p *ProviderResponse) MarshalJSON() ([]byte, error) {
+func (p *Response) MarshalJSON() ([]byte, error) {
 	obj := map[string]interface{}{"status": p.Status}
 
 	if p.Headers != nil {

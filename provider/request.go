@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-type ProviderRequest struct {
+type Request struct {
 	Method  string
 	Path    string
 	Query   string
@@ -13,7 +13,7 @@ type ProviderRequest struct {
 	HttpContent
 }
 
-func NewJsonProviderRequest(method, path, query string, headers http.Header) *ProviderRequest {
+func NewJsonRequest(method, path, query string, headers http.Header) *Request {
 	if method == "" {
 		//return error
 	}
@@ -22,7 +22,7 @@ func NewJsonProviderRequest(method, path, query string, headers http.Header) *Pr
 		//return error
 	}
 
-	return &ProviderRequest{
+	return &Request{
 		Method:      method,
 		Path:        path,
 		Query:       query,
@@ -31,11 +31,11 @@ func NewJsonProviderRequest(method, path, query string, headers http.Header) *Pr
 	}
 }
 
-func (p *ProviderRequest) ResetContent() {
+func (p *Request) ResetContent() {
 	p.HttpContent = nil
 }
 
-func (p *ProviderRequest) MarshalJSON() ([]byte, error) {
+func (p *Request) MarshalJSON() ([]byte, error) {
 	obj := map[string]interface{}{
 		"method": p.Method,
 		"path":   p.Path,

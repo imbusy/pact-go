@@ -13,9 +13,9 @@ type ProviderService interface {
 	//UponReceiving this interaction with description
 	UponReceiving(description string) ProviderService
 	//With this request
-	With(request provider.ProviderRequest) ProviderService
+	With(request provider.Request) ProviderService
 	//WillRespondWith with this response
-	WillRespondWith(response provider.ProviderResponse) error
+	WillRespondWith(response provider.Response) error
 	//ClearInteractions clears all the registered interaactions
 	ClearInteractions() ProviderService
 	//VerifyInteractions checks if all the registered interactions have been verified
@@ -23,8 +23,8 @@ type ProviderService interface {
 }
 
 type mockProviderService struct {
-	providerRequest  *provider.ProviderRequest
-	providerResponse *provider.ProviderResponse
+	providerRequest  *provider.Request
+	providerResponse *provider.Response
 	state            string
 	description      string
 	service          *consumer.HTTPMockService
@@ -45,12 +45,12 @@ func (p *mockProviderService) UponReceiving(description string) ProviderService 
 	return p
 }
 
-func (p *mockProviderService) With(providerRequest provider.ProviderRequest) ProviderService {
+func (p *mockProviderService) With(providerRequest provider.Request) ProviderService {
 	p.providerRequest = &providerRequest
 	return p
 }
 
-func (p *mockProviderService) WillRespondWith(providerResponse provider.ProviderResponse) error {
+func (p *mockProviderService) WillRespondWith(providerResponse provider.Response) error {
 	p.providerResponse = &providerResponse
 	if err := p.registerInteraction(); err != nil {
 		return err

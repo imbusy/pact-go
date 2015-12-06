@@ -11,10 +11,10 @@ import (
 )
 
 type Interaction struct {
-	State       string                     `json:"provider_state", omitempty`
-	Description string                     `json:"description"`
-	Request     *provider.ProviderRequest  `json:"request"`
-	Response    *provider.ProviderResponse `json:"response"`
+	State       string             `json:"provider_state", omitempty`
+	Description string             `json:"description"`
+	Request     *provider.Request  `json:"request"`
+	Response    *provider.Response `json:"response"`
 }
 
 var (
@@ -23,8 +23,8 @@ var (
 	errNilResponse      = errors.New("Cannot register interaction with nil response")
 )
 
-func NewInteraction(description string, state string, request *provider.ProviderRequest,
-	response *provider.ProviderResponse) (*Interaction, error) {
+func NewInteraction(description string, state string, request *provider.Request,
+	response *provider.Response) (*Interaction, error) {
 
 	if description == "" {
 		return nil, errEmptyDescription

@@ -13,10 +13,10 @@ func Test_CanBuild(t *testing.T) {
 		HasPactWith("api")
 	ps, _ := builder.GetMockProviderService()
 
-	request := provider.NewJsonProviderRequest("GET", "/user", "id=23", nil)
+	request := provider.NewJsonRequest("GET", "/user", "id=23", nil)
 	header := make(http.Header)
 	header.Add("content-type", "application/json")
-	response := provider.NewJsonProviderResponse(200, header)
+	response := provider.NewJsonResponse(200, header)
 	response.SetBody(`{ "id": 23, "firstName": "John", "lastName": "Doe" }`)
 
 	if err := ps.Given("there is a user with id {23}").

@@ -11,7 +11,7 @@ import (
 )
 
 type Interaction struct {
-	State       string             `json:"provider_state", omitempty`
+	State       string             `json:"provider_state,omitempty"`
 	Description string             `json:"description"`
 	Request     *provider.Request  `json:"request"`
 	Response    *provider.Response `json:"response"`

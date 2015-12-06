@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/SEEK-Jobs/pact-go/provider"
 )
 
 func Test_ShouldVerify_MissingInteractions(t *testing.T) {
-	i := NewInteraction("description", "state", nil, nil)
+	i, _ := NewInteraction("description", "state", provider.NewJsonProviderRequest("GET", "/", "", nil), provider.NewJsonProviderResponse(200, nil))
 	registered := []*Interaction{
 		i,
 	}
@@ -22,7 +24,7 @@ func Test_ShouldVerify_MissingInteractions(t *testing.T) {
 }
 
 func Test_ShouldVerify_MultipleSameInteractionCalls(t *testing.T) {
-	i := NewInteraction("description", "state", nil, nil)
+	i, _ := NewInteraction("description", "state", provider.NewJsonProviderRequest("GET", "/", "", nil), provider.NewJsonProviderResponse(200, nil))
 	registered := []*Interaction{i}
 	requested := []*Interaction{i, i, i}
 	if err := verifyInteractions(registered, requested); err != nil {
@@ -36,7 +38,7 @@ func Test_ShouldVerify_MultipleSameInteractionCalls(t *testing.T) {
 }
 
 func Test_ShouldVerify_UnexpectedInteractionVerfications(t *testing.T) {
-	i := NewInteraction("description", "state", nil, nil)
+	i, _ := NewInteraction("description", "state", provider.NewJsonProviderRequest("GET", "/", "", nil), provider.NewJsonProviderResponse(200, nil))
 	registered := []*Interaction{}
 	requested := []*Interaction{i}
 	if err := verifyInteractions(registered, requested); err != nil {
@@ -49,7 +51,7 @@ func Test_ShouldVerify_UnexpectedInteractionVerfications(t *testing.T) {
 }
 
 func Test_ShouldVerify_Interactions(t *testing.T) {
-	i := NewInteraction("description", "state", nil, nil)
+	i, _ := NewInteraction("description", "state", provider.NewJsonProviderRequest("GET", "/", "", nil), provider.NewJsonProviderResponse(200, nil))
 	registered := []*Interaction{i}
 	requested := []*Interaction{i}
 	if err := verifyInteractions(registered, requested); err != nil {

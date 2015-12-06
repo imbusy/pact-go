@@ -2,10 +2,12 @@ package consumer
 
 import (
 	"bytes"
-	"github.com/SEEK-Jobs/pact-go/provider"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/SEEK-Jobs/pact-go/provider"
 )
 
 type Interaction struct {
@@ -15,14 +17,29 @@ type Interaction struct {
 	Response    *provider.ProviderResponse `json:"response"`
 }
 
+var (
+	errEmptyDescription = errors.New("Cannot register interaction with empty description.")
+	errNilRequest       = errors.New("Cannot register interaction with nil request")
+	errNilResponse      = errors.New("Cannot register interaction with nil response")
+)
+
 func NewInteraction(description string, state string, request *provider.ProviderRequest,
-	response *provider.ProviderResponse) *Interaction {
+	response *provider.ProviderResponse) (*Interaction, error) {
+
+	if description == "" {
+		return nil, errEmptyDescription
+	} else if request == nil {
+		return nil, errNilRequest
+	} else if response == nil {
+		return nil, errNilResponse
+	}
+
 	return &Interaction{
 		State:       state,
 		Description: description,
 		Request:     request,
 		Response:    response,
-	}
+	}, nil
 }
 
 func (i *Interaction) ToHttpRequest(baseUrl string) (*http.Request, error) {

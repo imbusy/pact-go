@@ -33,7 +33,7 @@ func Test_ValidPact_ShouldWritePactFile(t *testing.T) {
 func getFakeInteraction() *consumer.Interaction {
 	header := make(http.Header)
 	header.Add("content-type", "application/json")
-	i := consumer.NewInteraction("description of the interaction",
+	i, _ := consumer.NewInteraction("description of the interaction",
 		"some state",
 		provider.NewJsonProviderRequest("POST", "/", "param=xyzmk", header),
 		provider.NewJsonProviderResponse(201, header))

@@ -3,15 +3,16 @@ package consumer
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/SEEK-Jobs/pact-go/provider"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/SEEK-Jobs/pact-go/provider"
 )
 
 func Test_InvalidUrl_MappingToHttpRequestFails(t *testing.T) {
 	request := &provider.ProviderRequest{}
-	interaction := NewInteraction("Some State", "description", request, nil)
+	interaction, _ := NewInteraction("Some State", "description", request, nil)
 	req, err := interaction.ToHttpRequest("bad.url")
 
 	if err == nil || req != nil {

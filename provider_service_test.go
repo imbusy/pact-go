@@ -13,10 +13,10 @@ func Test_CanReigsterInteraction_WithValidData(t *testing.T) {
 
 	header := make(http.Header)
 	header.Add("content-type", "payload/nuclear")
-	request := provider.NewJsonRequest("POST", "/luke", "action=attack", header)
+	request := provider.NewJSONRequest("POST", "/luke", "action=attack", header)
 	request.SetBody(`{ "simulation": false, "target": "Death Star" }`)
 
-	response := provider.NewJsonResponse(200, nil)
+	response := provider.NewJSONResponse(200, nil)
 
 	if err := ps.Given("Force is strong with Luke Skywalker").
 		UponReceiving("Destroy death star").
@@ -29,8 +29,8 @@ func Test_CanReigsterInteraction_WithValidData(t *testing.T) {
 func Test_CannotReigsterInteraction_WithInvalidData(t *testing.T) {
 	ps := newMockProviderService(&Config{})
 
-	request := provider.NewJsonRequest("POST", "/luke", "action=attack", nil)
-	response := provider.NewJsonResponse(200, nil)
+	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
+	response := provider.NewJSONResponse(200, nil)
 
 	if err := ps.Given("Force is strong with Luke Skywalker").
 		With(*request).
@@ -44,10 +44,10 @@ func Test_CanResetTransientState_AfterRegistration(t *testing.T) {
 
 	header := make(http.Header)
 	header.Add("content-type", "payload/nuclear")
-	request := provider.NewJsonRequest("POST", "/luke", "action=attack", header)
+	request := provider.NewJSONRequest("POST", "/luke", "action=attack", header)
 	request.SetBody(`{ "simulation": false, "target": "Death Star" }`)
 
-	response := provider.NewJsonResponse(200, nil)
+	response := provider.NewJSONResponse(200, nil)
 
 	if err := ps.Given("Force is strong with Luke Skywalker").
 		UponReceiving("Destroy death star").
@@ -64,8 +64,8 @@ func Test_CanResetTransientState_AfterRegistration(t *testing.T) {
 func Test_CanClearInteractions(t *testing.T) {
 	ps := newMockProviderService(&Config{})
 
-	request := provider.NewJsonRequest("POST", "/luke", "action=attack", nil)
-	response := provider.NewJsonResponse(200, nil)
+	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
+	response := provider.NewJSONResponse(200, nil)
 
 	if err := ps.Given("Force is strong with Luke Skywalker").
 		UponReceiving("Destroy death star").
@@ -87,8 +87,8 @@ func Test_CanClearInteractions(t *testing.T) {
 func Test_CanVerifyInteractions(t *testing.T) {
 	ps := newMockProviderService(&Config{})
 
-	request := provider.NewJsonRequest("POST", "/luke", "action=attack", nil)
-	response := provider.NewJsonResponse(200, nil)
+	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
+	response := provider.NewJSONResponse(200, nil)
 
 	if err := ps.Given("Force is strong with Luke Skywalker").
 		UponReceiving("Destroy death star").

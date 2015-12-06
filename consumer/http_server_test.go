@@ -20,7 +20,7 @@ func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {
 
 	client := &http.Client{}
 
-	req, err := interaction.ToHttpRequest(url)
+	req, err := interaction.ToHTTPRequest(url)
 	resp, err := client.Do(req)
 
 	if err != nil {
@@ -64,7 +64,7 @@ func Test_MatchingInteractionNotFound_Returns404(t *testing.T) {
 
 	client := &http.Client{}
 
-	req, err := interaction.ToHttpRequest(url)
+	req, err := interaction.ToHTTPRequest(url)
 	resp, err := client.Do(req)
 
 	if err != nil {
@@ -93,8 +93,8 @@ func getFakeInteraction() *Interaction {
 	header.Add("content-type", "application/json")
 	i, _ := NewInteraction("description of the interaction",
 		"some state",
-		provider.NewJsonRequest("GET", "/", "param=xyzmk", header),
-		provider.NewJsonResponse(201, header))
+		provider.NewJSONRequest("GET", "/", "param=xyzmk", header),
+		provider.NewJSONResponse(201, header))
 	i.Request.SetBody(`{ "firstName": "John", "lastName": "Doe" }`)
 
 	return i

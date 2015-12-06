@@ -9,7 +9,7 @@ import (
 )
 
 func Test_ShouldVerify_MissingInteractions(t *testing.T) {
-	i, _ := NewInteraction("description", "state", provider.NewJsonRequest("GET", "/", "", nil), provider.NewJsonResponse(200, nil))
+	i, _ := NewInteraction("description", "state", provider.NewJSONRequest("GET", "/", "", nil), provider.NewJSONResponse(200, nil))
 	registered := []*Interaction{
 		i,
 	}
@@ -24,7 +24,7 @@ func Test_ShouldVerify_MissingInteractions(t *testing.T) {
 }
 
 func Test_ShouldVerify_MultipleSameInteractionCalls(t *testing.T) {
-	i, _ := NewInteraction("description", "state", provider.NewJsonRequest("GET", "/", "", nil), provider.NewJsonResponse(200, nil))
+	i, _ := NewInteraction("description", "state", provider.NewJSONRequest("GET", "/", "", nil), provider.NewJSONResponse(200, nil))
 	registered := []*Interaction{i}
 	requested := []*Interaction{i, i, i}
 	if err := verifyInteractions(registered, requested); err != nil {
@@ -38,7 +38,7 @@ func Test_ShouldVerify_MultipleSameInteractionCalls(t *testing.T) {
 }
 
 func Test_ShouldVerify_UnexpectedInteractionVerfications(t *testing.T) {
-	i, _ := NewInteraction("description", "state", provider.NewJsonRequest("GET", "/", "", nil), provider.NewJsonResponse(200, nil))
+	i, _ := NewInteraction("description", "state", provider.NewJSONRequest("GET", "/", "", nil), provider.NewJSONResponse(200, nil))
 	registered := []*Interaction{}
 	requested := []*Interaction{i}
 	if err := verifyInteractions(registered, requested); err != nil {
@@ -51,7 +51,7 @@ func Test_ShouldVerify_UnexpectedInteractionVerfications(t *testing.T) {
 }
 
 func Test_ShouldVerify_Interactions(t *testing.T) {
-	i, _ := NewInteraction("description", "state", provider.NewJsonRequest("GET", "/", "", nil), provider.NewJsonResponse(200, nil))
+	i, _ := NewInteraction("description", "state", provider.NewJSONRequest("GET", "/", "", nil), provider.NewJSONResponse(200, nil))
 	registered := []*Interaction{i}
 	requested := []*Interaction{i}
 	if err := verifyInteractions(registered, requested); err != nil {

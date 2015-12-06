@@ -13,7 +13,7 @@ import (
 func Test_InvalidUrl_MappingToHttpRequestFails(t *testing.T) {
 	request := &provider.Request{}
 	interaction, _ := NewInteraction("Some State", "description", request, nil)
-	req, err := interaction.ToHttpRequest("bad.url")
+	req, err := interaction.ToHTTPRequest("bad.url")
 
 	if err == nil || req != nil {
 		t.Error("Should not parse invalid url.")
@@ -26,7 +26,7 @@ func Test_InvalidUrl_MappingToHttpRequestFails(t *testing.T) {
 func Test_ValidRequest_MapsToHttpRequest(t *testing.T) {
 	interaction := getFakeInteraction()
 	baseUrl, _ := url.Parse("http://localhost:52343/")
-	req, err := interaction.ToHttpRequest(baseUrl.String())
+	req, err := interaction.ToHTTPRequest(baseUrl.String())
 
 	if err != nil {
 		t.Error(err)
@@ -54,7 +54,7 @@ func Test_ValidResponse_WritesToHttpResponse(t *testing.T) {
 	interaction := getFakeInteraction()
 	rec := httptest.NewRecorder()
 
-	interaction.WriteToHttpResponse(rec)
+	interaction.WriteToHTTPResponse(rec)
 
 	if rec.Code != interaction.Response.Status {
 		t.Errorf("Expected status %v, but recieved %v", interaction.Response.Status, rec.Code)

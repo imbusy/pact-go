@@ -5,31 +5,35 @@ import (
 	"net/http"
 )
 
+//Response provider response
 type Response struct {
 	Status  int
 	Headers http.Header
-	HttpContent
+	httpContent
 }
 
-func NewJsonResponse(status int, headers http.Header) *Response {
+//NewJSONResponse creates new response with body as json content
+func NewJSONResponse(status int, headers http.Header) *Response {
 	return &Response{
 		Status:      status,
 		Headers:     headers,
-		HttpContent: &jsonContent{},
+		httpContent: &jsonContent{},
 	}
 }
 
+//ResetContent emoves an existing contentß
 func (p *Response) ResetContent() {
-	p.HttpContent = nil
+	p.httpContent = nil
 }
 
+//MarshalJSON custom json marshaling
 func (p *Response) MarshalJSON() ([]byte, error) {
 	obj := map[string]interface{}{"status": p.Status}
 
 	if p.Headers != nil {
 		obj["headers"] = getHeaderWithSingleValues(p.Headers)
 	}
-	if p.HttpContent != nil {
+	if p.httpContent != nil {
 		if body := p.GetBody(); body != nil {
 			obj["body"] = body
 		}

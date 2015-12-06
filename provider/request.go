@@ -5,15 +5,17 @@ import (
 	"net/http"
 )
 
+//Request provider request
 type Request struct {
 	Method  string
 	Path    string
 	Query   string
 	Headers http.Header
-	HttpContent
+	httpContent
 }
 
-func NewJsonRequest(method, path, query string, headers http.Header) *Request {
+//NewJSONRequest creates new http request with content body as json
+func NewJSONRequest(method, path, query string, headers http.Header) *Request {
 	if method == "" {
 		//return error
 	}
@@ -27,14 +29,16 @@ func NewJsonRequest(method, path, query string, headers http.Header) *Request {
 		Path:        path,
 		Query:       query,
 		Headers:     headers,
-		HttpContent: &jsonContent{},
+		httpContent: &jsonContent{},
 	}
 }
 
+//ResetContent removes an existing contentß
 func (p *Request) ResetContent() {
-	p.HttpContent = nil
+	p.httpContent = nil
 }
 
+//MarshalJSON custom json marshaling
 func (p *Request) MarshalJSON() ([]byte, error) {
 	obj := map[string]interface{}{
 		"method": p.Method,
@@ -49,7 +53,7 @@ func (p *Request) MarshalJSON() ([]byte, error) {
 		obj["headers"] = getHeaderWithSingleValues(p.Headers)
 	}
 
-	if p.HttpContent != nil {
+	if p.httpContent != nil {
 		if body := p.GetBody(); body != nil {
 			obj["body"] = body
 		}

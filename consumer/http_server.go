@@ -32,7 +32,7 @@ func (ms *HTTPMockService) Start() string {
 			} else if err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 			} else {
-				matchedInteraction.WriteToHttpResponse(w)
+				matchedInteraction.WriteToHTTPResponse(w)
 				ms.requestedInteractions = append(ms.requestedInteractions, matchedInteraction)
 			}
 		}))
@@ -70,7 +70,7 @@ func (ms *HTTPMockService) GetRegisteredInteractions() []*Interaction {
 func (ms *HTTPMockService) findMatchingInteraction(r *http.Request, interactions []*Interaction) (*Interaction, error) {
 
 	for i := range interactions {
-		req, err := interactions[i].ToHttpRequest(ms.server.URL)
+		req, err := interactions[i].ToHTTPRequest(ms.server.URL)
 
 		if err != nil {
 			return nil, err

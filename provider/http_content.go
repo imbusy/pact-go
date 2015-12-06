@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type HttpContent interface {
+type httpContent interface {
 	GetData() ([]byte, error)
 	GetBody() interface{}
 	SetBody(content interface{}) error
@@ -42,7 +42,7 @@ func (c *jsonContent) GetBody() interface{} {
 func (c *jsonContent) SetBody(content interface{}) error {
 	switch v := reflect.ValueOf(content); v.Kind() {
 	case reflect.String:
-		return c.setJsonStringBody(v.String())
+		return c.setJSONStringBody(v.String())
 	case reflect.Struct:
 		return c.setStructBody(v.Interface())
 	case reflect.Slice:
@@ -53,23 +53,22 @@ func (c *jsonContent) SetBody(content interface{}) error {
 	return nil
 }
 
-func (c *jsonContent) setJsonStringBody(content string) error {
+func (c *jsonContent) setJSONStringBody(content string) error {
 	var val interface{}
 	d := json.NewDecoder(strings.NewReader(content))
 	d.UseNumber()
-	if err := d.Decode(&val); err == nil {
-		switch v := reflect.ValueOf(val); v.Kind() {
-		case reflect.Map:
-			return c.setStructBody(val)
-		case reflect.Slice:
-			c.setSliceBody(v)
-		default:
-			return errors.New("conent is not valid json")
-		}
-		return nil
-	} else {
+	if err := d.Decode(&val); err != nil {
 		return err
 	}
+	switch v := reflect.ValueOf(val); v.Kind() {
+	case reflect.Map:
+		return c.setStructBody(val)
+	case reflect.Slice:
+		c.setSliceBody(v)
+	default:
+		return errors.New("conent is not valid json")
+	}
+	return nil
 }
 
 func (c *jsonContent) setStructBody(content interface{}) error {

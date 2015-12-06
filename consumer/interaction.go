@@ -42,8 +42,8 @@ func NewInteraction(description string, state string, request *provider.Request,
 	}, nil
 }
 
-func (i *Interaction) ToHttpRequest(baseUrl string) (*http.Request, error) {
-	u, err := url.ParseRequestURI(baseUrl)
+func (i *Interaction) ToHTTPRequest(baseURL string) (*http.Request, error) {
+	u, err := url.ParseRequestURI(baseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (i *Interaction) ToHttpRequest(baseUrl string) (*http.Request, error) {
 	return req, nil
 }
 
-func (i *Interaction) WriteToHttpResponse(w http.ResponseWriter) error {
+func (i *Interaction) WriteToHTTPResponse(w http.ResponseWriter) error {
 	w.WriteHeader(i.Response.Status)
 	respHeader := w.Header()
 

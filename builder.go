@@ -4,19 +4,25 @@ import (
 	"errors"
 )
 
+//Builder Pact Builder
 type Builder interface {
+	//ServiceConsumer consumer which creates the pact
 	ServiceConsumer(consumer string) Builder
+	//HasPactWith sets the provider with which cosumer has pact
 	HasPactWith(serviceProvider string) Builder
-	GetMockProviderService() (p ProviderService, serverUrl string)
+	//GetMockProviderService Returns the mock provider service and it's url
+	GetMockProviderService() (p ProviderService, serverURL string)
+	//Build Builds the pact and persists it
 	Build() error
 }
 
+//Config configuration needed to build pacts
 type Config struct {
 	PactPath string
 	LogPath  string
 }
 
-type ConsumerPactBuilder struct {
+type consumerPactBuilder struct {
 	consumer        string
 	serviceProvider string
 	providerService *mockProviderService
@@ -27,26 +33,27 @@ var (
 	errInvalidProvider = errors.New("ProviderName has not been set, please supply a provider name using the HasPactWith method.")
 )
 
+//NewConsumerPactBuilder Factory method to create new consumer pact builder
 func NewConsumerPactBuilder(pactConfig *Config) Builder {
-	return &ConsumerPactBuilder{providerService: newMockProviderService(pactConfig)}
+	return &consumerPactBuilder{providerService: newMockProviderService(pactConfig)}
 }
 
-func (c *ConsumerPactBuilder) ServiceConsumer(consumer string) Builder {
+func (c *consumerPactBuilder) ServiceConsumer(consumer string) Builder {
 	c.consumer = consumer
 	return c
 }
 
-func (c *ConsumerPactBuilder) HasPactWith(serviceProvider string) Builder {
+func (c *consumerPactBuilder) HasPactWith(serviceProvider string) Builder {
 	c.serviceProvider = serviceProvider
 	return c
 }
 
-func (c *ConsumerPactBuilder) GetMockProviderService() (ProviderService, string) {
+func (c *consumerPactBuilder) GetMockProviderService() (ProviderService, string) {
 	url := c.providerService.start()
 	return c.providerService, url
 }
 
-func (c *ConsumerPactBuilder) Build() error {
+func (c *consumerPactBuilder) Build() error {
 	if c.consumer == "" {
 		return errInvalidConsumer
 	} else if c.serviceProvider == "" {
@@ -54,8 +61,9 @@ func (c *ConsumerPactBuilder) Build() error {
 	}
 	if err := c.providerService.persistPact(c.consumer, c.serviceProvider); err != nil {
 		return err
-	} else {
-		c.providerService.stop()
-		return nil
 	}
+
+	c.providerService.stop()
+	return nil
+
 }

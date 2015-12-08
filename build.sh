@@ -1,61 +1,28 @@
-function saveDependencies {
-	echo "Getting dependencies"
-	go get -d .
-
-	# echo "Saving dependencies"
-	# $GOPATH/bin/godep save ./...
-}
-
-function installGodep {
-	if [ ! -f $GOAPTH/bin/godep ];
-	then
-		go get github.com/tools/godep
-	fi
-}
-
-function runTests {
-	echo "Running Tests"
-	go test -v -cover ./...
-
-
-}
-
-function build {
-	echo "Building Application"
-
-	go build
-
-}
-
-
-# installGodep
-#
-# if [ $? -ne 0 ]; then
-#     echo "Could not install godep"
-#     exit 1
-# fi
-
-saveDependencies
+echo "Getting dependencies"
+go get -d .
 
 if [ $? -ne 0 ]; then
     echo "Could not save dependencies"
     exit 1
 fi
+echo "Vetting"
+go vet -v ./...
 
-runTests
+echo "Running Tests"
+go test -v -cover ./...
 
 if [ $? -ne 0 ]; then
     echo "Tests failed!"
     exit 1
 fi
 
-build
+echo "Building Application"
+go build
 
 
 if [ $? -ne 0 ]; then
     echo "Build failed!"
     exit 1
 fi
-
 
 echo "Build succeded!"

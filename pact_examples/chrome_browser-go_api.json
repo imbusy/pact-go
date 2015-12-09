@@ -1,9 +1,9 @@
 {
 	"consumer": {
-		"name": "browser"
+		"name": "chrome browser"
 	},
 	"provider": {
-		"name": "api"
+		"name": "go api"
 	},
 	"interactions": [
 		{

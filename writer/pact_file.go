@@ -3,6 +3,7 @@ package writer
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/SEEK-Jobs/pact-go/consumer"
 )
@@ -34,5 +35,7 @@ func (p *PactFile) ToJson() ([]byte, error) {
 }
 
 func (p *PactFile) FileName() string {
-	return fmt.Sprintf("%s-%s.json", p.Consumer.Name, p.Provider.Name)
+	consumer := strings.Replace(strings.ToLower(p.Consumer.Name), " ", "_", -1)
+	provider := strings.Replace(strings.ToLower(p.Provider.Name), " ", "_", -1)
+	return fmt.Sprintf("%s-%s.json", consumer, provider)
 }

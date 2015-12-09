@@ -9,8 +9,8 @@ import (
 
 func Test_CanBuild(t *testing.T) {
 	builder := NewConsumerPactBuilder(&Config{PactPath: "./pact_examples"}).
-		ServiceConsumer("browser").
-		HasPactWith("api")
+		ServiceConsumer("chrome browser").
+		HasPactWith("go api")
 	ps, _ := builder.GetMockProviderService()
 
 	request := provider.NewJSONRequest("GET", "/user", "id=23", nil)

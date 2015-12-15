@@ -87,7 +87,10 @@ func (p *mockProviderService) registerInteraction() error {
 	if err != nil {
 		return err
 	}
-	p.service.RegisterInteraction(interaction)
+	if err := p.service.RegisterInteraction(interaction); err != nil {
+		return err
+	}
+
 	p.resetTransientState()
 	return nil
 }

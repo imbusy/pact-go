@@ -39,6 +39,52 @@ func Test_CannotReigsterInteraction_WithInvalidData(t *testing.T) {
 	}
 }
 
+func Test_CannotReigster_DuplicateInteraction(t *testing.T) {
+	ps := newMockProviderService(&Config{})
+
+	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
+	response := provider.NewJSONResponse(200, nil)
+
+	if err := ps.Given("Force is strong with Luke Skywalker").
+		UponReceiving("Destroy death star").
+		With(*request).
+		WillRespondWith(*response); err != nil {
+		t.Error(err)
+	}
+
+	if err := ps.Given("Force is strong with Luke Skywalker").
+		UponReceiving("Destroy death star").
+		With(*request).
+		WillRespondWith(*response); err == nil {
+		t.Error("Should not allow to register duplicate interaction")
+	}
+
+}
+
+func Test_CanReigsterDuplicateInteraction_InDifferentScope(t *testing.T) {
+	ps := newMockProviderService(&Config{})
+
+	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
+	response := provider.NewJSONResponse(200, nil)
+
+	if err := ps.Given("Force is strong with Luke Skywalker").
+		UponReceiving("Destroy death star").
+		With(*request).
+		WillRespondWith(*response); err != nil {
+		t.Error(err)
+	}
+
+	ps.ClearInteractions()
+
+	if err := ps.Given("Force is strong with Luke Skywalker").
+		UponReceiving("Destroy death star").
+		With(*request).
+		WillRespondWith(*response); err != nil {
+		t.Error(err)
+	}
+
+}
+
 func Test_CanResetTransientState_AfterRegistration(t *testing.T) {
 	ps := newMockProviderService(&Config{})
 
@@ -76,7 +122,7 @@ func Test_CanClearInteractions(t *testing.T) {
 
 	ps.ClearInteractions()
 
-	if interactions := ps.service.GetRegisteredInteractions(); len(interactions) > 0 {
+	if !ps.service.IsTestScopeClear() {
 		t.Error("Interactions have not been cleared")
 	}
 	if ps.state != "" || ps.description != "" || ps.providerRequest != nil || ps.providerResponse != nil {

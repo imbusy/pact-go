@@ -119,7 +119,7 @@ func TestPactWithProvider(t *testing.T) {
   ms.ClearInteractions()
 
 
-  //Finally, build the pact to produce json file in the folder specified in the config
+  //Finally, build to produce the pact json file
   if err := builder.Build(); err != nil {
 		t.Error(err)
 	}

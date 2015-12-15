@@ -66,8 +66,8 @@ func buildPact() {
 		HasPactWith("my provider")
 }
 ```
-##### 3. Add your test
-Add your test method register and verify your pact
+##### 3. Add your tests
+Add your test method to register and verify your interactions with provider
 ```go
 
 import (

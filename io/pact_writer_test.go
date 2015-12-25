@@ -8,7 +8,7 @@ import (
 	"github.com/SEEK-Jobs/pact-go/provider"
 )
 
-func Test_InvalidPath_ShouldThrowError(t *testing.T) {
+func Test_Writer_InvalidPath_ShouldThrowError(t *testing.T) {
 	pact := NewPactFile("consumer", "provider", nil)
 	writer := NewPactFileWriter(pact, "//g34/example")
 
@@ -17,7 +17,7 @@ func Test_InvalidPath_ShouldThrowError(t *testing.T) {
 	}
 }
 
-func Test_ValidPact_ShouldWritePactFile(t *testing.T) {
+func Test_Writer_ValidPact_ShouldWritePactFile(t *testing.T) {
 	var interactions []*consumer.Interaction
 	interactions = append(interactions, getFakeInteraction())
 

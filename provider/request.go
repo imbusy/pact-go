@@ -2,6 +2,7 @@ package provider
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -60,6 +61,41 @@ func (p *Request) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(obj)
+}
+
+//UnmarshalJSON cusotm json unmarshalling
+func (p *Request) UnmarshalJSON(b []byte) error {
+	var obj map[string]interface{}
+	r := Request{httpContent: &jsonContent{}}
+	if err := json.Unmarshal(b, &obj); err != nil {
+		return err
+	}
+
+	if method, ok := obj["method"].(string); ok {
+		r.Method = method
+	} else {
+		return errors.New("Could not unmarshal request, method value is either nil or not a string")
+	}
+
+	if path, ok := obj["path"].(string); ok {
+		r.Path = path
+	} else {
+		return errors.New("Could not unmarshal request, path value is either nil or not a string")
+	}
+
+	if path, ok := obj["query"].(string); ok {
+		r.Path = path
+	}
+
+	if headers, ok := obj["headers"].(map[string]string); ok {
+		for key, val := range headers {
+			r.Headers.Add(key, val)
+		}
+	}
+
+	r.SetBody(obj["body"])
+	*p = Request(r)
+	return nil
 }
 
 func getHeaderWithSingleValues(headers http.Header) map[string]string {

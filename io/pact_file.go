@@ -8,15 +8,21 @@ import (
 	"github.com/SEEK-Jobs/pact-go/consumer"
 )
 
+const pactSpecification = "1.1.0"
+
 type Participant struct {
 	Name string `json:"name"`
+}
+
+type metadata struct {
+	PactSpecification string `json:"pactSpecification"`
 }
 
 type PactFile struct {
 	Consumer     *Participant            `json:"consumer"`
 	Provider     *Participant            `json:"provider"`
 	Interactions []*consumer.Interaction `json:"interactions"`
-	Metadata     interface{}             `json:"metaData"`
+	Metadata     *metadata               `json:"metaData"`
 }
 
 func NewPactFile(consumer string, provider string, interactions []*consumer.Interaction) *PactFile {
@@ -24,9 +30,7 @@ func NewPactFile(consumer string, provider string, interactions []*consumer.Inte
 		Consumer:     &Participant{Name: consumer},
 		Provider:     &Participant{Name: provider},
 		Interactions: interactions,
-		Metadata: struct {
-			PactSpecification string `json:"pactSpecification"`
-		}{PactSpecification: "1.1.0"},
+		Metadata:     &metadata{PactSpecification: pactSpecification},
 	}
 }
 

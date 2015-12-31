@@ -6,7 +6,7 @@ import (
 	"io"
 )
 
-func bodyMatches(expected, actual io.ReadCloser) (bool, diff.Differences, error) {
+func bodyMatches(expected, actual io.Reader) (bool, diff.Differences, error) {
 	if expected == nil {
 		return true, nil, nil
 	}
@@ -24,7 +24,7 @@ func bodyMatches(expected, actual io.ReadCloser) (bool, diff.Differences, error)
 		return false, nil, err
 	}
 
-	if result, diffs := diff.DeepDiff(e, a, diff.DefaultConfig); result {
+	if result, diffs := diff.DeepDiff(e, a, &diff.DiffConfig{AllowUnexpectedKeys: true, RootPath: "[\"body\"]"}); result {
 		return result, nil, nil
 	} else {
 		return result, diffs, nil

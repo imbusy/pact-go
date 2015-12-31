@@ -5,5 +5,8 @@ import (
 )
 
 func headerMatches(expected, actual map[string][]string) (bool, diff.Differences) {
-	return diff.DeepDiff(expected, actual, nil)
+	if expected == nil {
+		return true, nil
+	}
+	return diff.DeepDiff(expected, actual, &diff.DiffConfig{AllowUnexpectedKeys: true, RootPath: "[\"header\"]"})
 }

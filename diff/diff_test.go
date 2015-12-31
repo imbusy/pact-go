@@ -108,13 +108,13 @@ func TestEqualities(t *testing.T) {
 func TestInequalities(t *testing.T) {
 	t.Parallel()
 	for _, test := range inequalTests {
-		r, diffs := DeepDiff(test.a, test.b, &DiffConfig{AllowUnexpectedKeys: false})
+		r, diffs := DeepDiff(test.a, test.b, &DiffConfig{AllowUnexpectedKeys: false, RootPath: rootPath})
 		if r != false {
 			t.Errorf("DeepDiff(%v, %v) = %v, want %v", test.a, test.b, r, false)
 			continue
 		}
 
-		if test.diff.Reason() != diffs[0].Reason() {
+		if test.diff.String() != diffs[0].String() {
 			t.Errorf("DeepDiff(%v, %v); \ngot: %s, \nwant %s", test.a, test.b, diffs[0], test.diff)
 		}
 	}

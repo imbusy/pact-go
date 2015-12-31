@@ -13,7 +13,7 @@ func MatchRequest(expected, actual *http.Request) (bool, error) {
 		return false, nil
 	} else if res, _ := headerMatches(expected.Header, actual.Header); !res {
 		return false, nil
-	} else if res, _, err := bodyMatches(expected.Body, actual.Body); !res {
+	} else if res, _, err := bodyMatches(expected.Body, actual.Body); err != nil || !res {
 		return false, err
 	}
 	return true, nil

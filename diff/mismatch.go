@@ -27,11 +27,6 @@ const (
 	mNonNilFunc
 )
 
-var (
-	diffMsg       = "mismatch at %s: %s \nexpected: \n\t%#v \nrecieved \n\t%#v"
-	diffMsgReason = "mismatch at %s: %s"
-)
-
 var typeMsgs = map[mismatchType]string{
 	mType:            "type mismatch expected %s recieved %s",
 	mLen:             "length mismatch, expected %d recieved %d",
@@ -56,9 +51,5 @@ func newMismatch(v1, v2 reflect.Value, path string, typ mismatchType, typMsgArgs
 }
 
 func (m *Mismatch) String() string {
-	return fmt.Sprintf(diffMsg, m.path, m.how, interfaceOf(m.v1), interfaceOf(m.v2))
-}
-
-func (m *Mismatch) Reason() string {
-	return fmt.Sprintf(diffMsgReason, m.path, m.how)
+	return fmt.Sprintf("mismatch at %s: %s", m.path, m.how)
 }

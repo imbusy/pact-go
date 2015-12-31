@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	rootPath      = "$root"
-	DefaultConfig = &DiffConfig{AllowUnexpectedKeys: true}
+	rootPath      = "[\".\"]"
+	DefaultConfig = &DiffConfig{AllowUnexpectedKeys: true, RootPath: rootPath}
 )
 
 // During deepValueEqual, must keep track of checks that are
@@ -24,6 +24,7 @@ type visit struct {
 
 type DiffConfig struct {
 	AllowUnexpectedKeys bool
+	RootPath            string
 }
 
 type Differences []*Mismatch
@@ -286,7 +287,7 @@ func DeepDiff(a1, a2 interface{}, conf *DiffConfig) (bool, Differences) {
 	}
 
 	mismatchf := func(typ mismatchType, a ...interface{}) {
-		d.Append(newMismatch(reflect.ValueOf(a1), reflect.ValueOf(a2), rootPath, typ, a...))
+		d.Append(newMismatch(reflect.ValueOf(a1), reflect.ValueOf(a2), conf.RootPath, typ, a...))
 	}
 
 	if a1 == nil || a2 == nil {
@@ -299,7 +300,7 @@ func DeepDiff(a1, a2 interface{}, conf *DiffConfig) (bool, Differences) {
 	v1 := reflect.ValueOf(a1)
 	v2 := reflect.ValueOf(a2)
 
-	return deepValueEqual(rootPath, v1, v2, make(map[visit]bool), 0, &d, conf), d
+	return deepValueEqual(conf.RootPath, v1, v2, make(map[visit]bool), 0, &d, conf), d
 }
 
 // interfaceOf returns v.Interface() even if v.CanInterface() == false.

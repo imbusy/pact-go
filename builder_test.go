@@ -7,8 +7,8 @@ import (
 	"github.com/SEEK-Jobs/pact-go/provider"
 )
 
-func Test_CanBuild(t *testing.T) {
-	builder := NewConsumerPactBuilder(&Config{PactPath: "./pact_examples"}).
+func Test_Builder_CanBuild(t *testing.T) {
+	builder := NewConsumerPactBuilder(&BuilderConfig{PactPath: "./pact_examples"}).
 		ServiceConsumer("chrome browser").
 		HasPactWith("go api")
 	ps, _ := builder.GetMockProviderService()
@@ -42,8 +42,8 @@ func Test_CanBuild(t *testing.T) {
 	}
 }
 
-func Test_CannotBuild_WhenThereIsNoConsumer(t *testing.T) {
-	builder := NewConsumerPactBuilder(&Config{PactPath: "./"}).
+func Test_Builder_CannotBuild_WhenThereIsNoConsumer(t *testing.T) {
+	builder := NewConsumerPactBuilder(&BuilderConfig{PactPath: "./"}).
 		HasPactWith("serviceprovider")
 	if err := builder.Build(); err != nil {
 		if err != errInvalidConsumer {
@@ -54,8 +54,8 @@ func Test_CannotBuild_WhenThereIsNoConsumer(t *testing.T) {
 	}
 }
 
-func Test_CannotBuild_WhenThereIsNoProvider(t *testing.T) {
-	builder := NewConsumerPactBuilder(&Config{PactPath: "./"}).
+func Test_Builder_CannotBuild_WhenThereIsNoProvider(t *testing.T) {
+	builder := NewConsumerPactBuilder(&BuilderConfig{PactPath: "./"}).
 		ServiceConsumer("consumer")
 	if err := builder.Build(); err != nil {
 		if err != errInvalidProvider {
@@ -66,8 +66,8 @@ func Test_CannotBuild_WhenThereIsNoProvider(t *testing.T) {
 	}
 }
 
-func Test_CannotBuild_WhenPactCannotBePersisted(t *testing.T) {
-	builder := NewConsumerPactBuilder(&Config{PactPath: "//3434"}).
+func Test_Builder_CannotBuild_WhenPactCannotBePersisted(t *testing.T) {
+	builder := NewConsumerPactBuilder(&BuilderConfig{PactPath: "//3434"}).
 		ServiceConsumer("consumer").HasPactWith("serviceProvider")
 	if err := builder.Build(); err == nil {
 		t.Error("should not build without consumer")

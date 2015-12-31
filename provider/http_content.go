@@ -43,7 +43,7 @@ func (c *jsonContent) SetBody(content interface{}) error {
 	switch v := reflect.ValueOf(content); v.Kind() {
 	case reflect.String:
 		return c.setJSONStringBody(v.String())
-	case reflect.Struct:
+	case reflect.Map, reflect.Struct:
 		return c.setStructBody(v.Interface())
 	case reflect.Slice:
 		c.setSliceBody(v)

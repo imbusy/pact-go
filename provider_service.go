@@ -28,10 +28,10 @@ type mockProviderService struct {
 	state            string
 	description      string
 	service          *consumer.HTTPMockService
-	config           *Config
+	config           *BuilderConfig
 }
 
-func newMockProviderService(config *Config) *mockProviderService {
+func newMockProviderService(config *BuilderConfig) *mockProviderService {
 	return &mockProviderService{service: consumer.NewHTTPMockService(), config: config}
 }
 

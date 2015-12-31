@@ -56,12 +56,14 @@ func (p *Response) UnmarshalJSON(b []byte) error {
 		return errors.New("Could not unmarshal response, status value is either nil or not a int")
 	}
 
-	if headers, ok := obj["headers"].(map[string]string); ok {
+	if headers, ok := obj["headers"].(map[string]interface{}); ok {
+		r.Headers = make(http.Header)
 		for key, val := range headers {
-			r.Headers.Add(key, val)
+			if str, ok := val.(string); ok {
+				r.Headers.Add(key, str)
+			}
 		}
 	}
-
 	r.SetBody(obj["body"])
 	*p = Response(r)
 	return nil

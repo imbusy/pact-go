@@ -16,12 +16,6 @@ type Builder interface {
 	Build() error
 }
 
-//Config configuration needed to build pacts
-type Config struct {
-	PactPath string
-	LogPath  string
-}
-
 type consumerPactBuilder struct {
 	consumer        string
 	serviceProvider string
@@ -34,7 +28,10 @@ var (
 )
 
 //NewConsumerPactBuilder Factory method to create new consumer pact builder
-func NewConsumerPactBuilder(pactConfig *Config) Builder {
+func NewConsumerPactBuilder(pactConfig *BuilderConfig) Builder {
+	if pactConfig == nil {
+		pactConfig = DefaultBuilderConfig
+	}
 	return &consumerPactBuilder{providerService: newMockProviderService(pactConfig)}
 }
 

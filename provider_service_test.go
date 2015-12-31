@@ -8,8 +8,8 @@ import (
 	"github.com/SEEK-Jobs/pact-go/provider"
 )
 
-func Test_CanReigsterInteraction_WithValidData(t *testing.T) {
-	ps := newMockProviderService(&Config{})
+func Test_ProviderService_CanReigsterInteraction_WithValidData(t *testing.T) {
+	ps := newMockProviderService(&BuilderConfig{})
 
 	header := make(http.Header)
 	header.Add("content-type", "payload/nuclear")
@@ -26,8 +26,8 @@ func Test_CanReigsterInteraction_WithValidData(t *testing.T) {
 	}
 }
 
-func Test_CannotReigsterInteraction_WithInvalidData(t *testing.T) {
-	ps := newMockProviderService(&Config{})
+func Test_ProviderService_CannotReigsterInteraction_WithInvalidData(t *testing.T) {
+	ps := newMockProviderService(&BuilderConfig{})
 
 	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
 	response := provider.NewJSONResponse(200, nil)
@@ -39,8 +39,8 @@ func Test_CannotReigsterInteraction_WithInvalidData(t *testing.T) {
 	}
 }
 
-func Test_CannotReigster_DuplicateInteraction(t *testing.T) {
-	ps := newMockProviderService(&Config{})
+func Test_ProviderService_CannotReigster_DuplicateInteraction(t *testing.T) {
+	ps := newMockProviderService(&BuilderConfig{})
 
 	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
 	response := provider.NewJSONResponse(200, nil)
@@ -61,8 +61,8 @@ func Test_CannotReigster_DuplicateInteraction(t *testing.T) {
 
 }
 
-func Test_CanReigsterDuplicateInteraction_InDifferentScope(t *testing.T) {
-	ps := newMockProviderService(&Config{})
+func Test_ProviderService_CanReigsterDuplicateInteraction_InDifferentScope(t *testing.T) {
+	ps := newMockProviderService(&BuilderConfig{})
 
 	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
 	response := provider.NewJSONResponse(200, nil)
@@ -85,8 +85,8 @@ func Test_CanReigsterDuplicateInteraction_InDifferentScope(t *testing.T) {
 
 }
 
-func Test_CanResetTransientState_AfterRegistration(t *testing.T) {
-	ps := newMockProviderService(&Config{})
+func Test_ProviderService_CanResetTransientState_AfterRegistration(t *testing.T) {
+	ps := newMockProviderService(&BuilderConfig{})
 
 	header := make(http.Header)
 	header.Add("content-type", "payload/nuclear")
@@ -107,8 +107,8 @@ func Test_CanResetTransientState_AfterRegistration(t *testing.T) {
 	}
 }
 
-func Test_CanClearInteractions(t *testing.T) {
-	ps := newMockProviderService(&Config{})
+func Test_ProviderService_CanClearInteractions(t *testing.T) {
+	ps := newMockProviderService(&BuilderConfig{})
 
 	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
 	response := provider.NewJSONResponse(200, nil)
@@ -130,8 +130,8 @@ func Test_CanClearInteractions(t *testing.T) {
 	}
 }
 
-func Test_CanVerifyInteractions(t *testing.T) {
-	ps := newMockProviderService(&Config{})
+func Test_ProviderService_CanVerifyInteractions(t *testing.T) {
+	ps := newMockProviderService(&BuilderConfig{})
 
 	request := provider.NewJSONRequest("POST", "/luke", "action=attack", nil)
 	response := provider.NewJSONResponse(200, nil)

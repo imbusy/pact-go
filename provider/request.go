@@ -83,8 +83,8 @@ func (p *Request) UnmarshalJSON(b []byte) error {
 		return errors.New("Could not unmarshal request, path value is either nil or not a string")
 	}
 
-	if path, ok := obj["query"].(string); ok {
-		r.Path = path
+	if query, ok := obj["query"].(string); ok {
+		r.Query = query
 	}
 
 	if headers, ok := obj["headers"].(map[string]string); ok {

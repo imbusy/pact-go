@@ -95,9 +95,9 @@ func Test_Verifier_ThrowsError_ConsumerNotSet(t *testing.T) {
 	v := NewPactFileVerifier(nil, nil, nil)
 
 	if err := v.Verify(); err == nil {
-		t.Error("Expected empty conusmer name")
+		t.Error("Expected empty conusmer name error")
 	} else if err != errEmptyConsumer {
-		t.Error("Expected empty conusmer name")
+		t.Errorf("Expected %s, got %s", errEmptyConsumer, err)
 	}
 }
 
@@ -106,8 +106,8 @@ func Test_Verifier_ThrowsError_ProviderNotSet(t *testing.T) {
 		HonoursPactWith("consumer")
 
 	if err := v.Verify(); err == nil {
-		t.Error("Expected empty conusmer name")
-	} else if err != errEmptyConsumer {
-		t.Error("Expected empty conusmer name")
+		t.Error("Expected empty provider name error")
+	} else if err != errEmptyProvider {
+		t.Errorf("Expected %s, got %s", errEmptyProvider, err)
 	}
 }

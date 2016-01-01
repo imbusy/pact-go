@@ -18,10 +18,12 @@ func bodyMatches(expected, actual io.Reader) (bool, diff.Differences, error) {
 		return false, nil, err
 	}
 
-	decoder = json.NewDecoder(actual)
-	err = decoder.Decode(&a)
-	if err != nil {
-		return false, nil, err
+	if actual != nil {
+		decoder = json.NewDecoder(actual)
+		err = decoder.Decode(&a)
+		if err != nil {
+			return false, nil, err
+		}
 	}
 
 	if result, diffs := diff.DeepDiff(e, a, &diff.DiffConfig{AllowUnexpectedKeys: true, RootPath: "[\"body\"]"}); result {

@@ -54,6 +54,10 @@ func (c *jsonContent) SetBody(content interface{}) error {
 }
 
 func (c *jsonContent) setJSONStringBody(content string) error {
+	if content == "" {
+		return nil
+	}
+
 	var val interface{}
 	d := json.NewDecoder(strings.NewReader(content))
 	d.UseNumber()

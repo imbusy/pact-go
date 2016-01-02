@@ -7,8 +7,9 @@ import (
 )
 
 var (
-	DefaultVerifierConfig = &VerfierConfig{Logger: log.New(os.Stderr, "\t", 0)}
-	DefaultBuilderConfig  = &BuilderConfig{Logger: log.New(os.Stderr, "\t", 0)}
+	DefaultLogger         = log.New(os.Stderr, "\t", 0)
+	DefaultVerifierConfig = &VerfierConfig{Logger: DefaultLogger}
+	DefaultBuilderConfig  = &BuilderConfig{Logger: DefaultLogger}
 )
 
 //BuilderConfig configuration needed to build pacts

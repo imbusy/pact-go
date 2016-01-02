@@ -79,11 +79,11 @@ func (v *pactFileVerfier) Verify() error {
 	}
 
 	//get pact file
-	r := io.NewPactFileReader(v.pactUri)
-	f, err := r.Read()
+	f, err := v.getPactFile()
 	if err != nil {
 		return err
 	}
+
 	//validate interactions
 	if ok, err := v.validator.Validate(f, v.stateActions); err != nil {
 		return err
@@ -92,6 +92,17 @@ func (v *pactFileVerfier) Verify() error {
 	}
 
 	return nil
+}
+
+func (v *pactFileVerfier) getPactFile() (*io.PactFile, error) {
+	r := io.NewPactFileReader(v.pactUri)
+	f, err := r.Read()
+	if err != nil {
+		return nil, err
+	} else if err := f.Validate(); err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
 func (v *pactFileVerfier) verifyInternalState() error {

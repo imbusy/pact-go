@@ -2,6 +2,7 @@ package io
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -9,6 +10,11 @@ import (
 )
 
 const pactSpecification = "1.1.0"
+
+var (
+	errEmptyProvider = errors.New("Pactfile is invalid, provider name should not be empty.")
+	errEmptyConsumer = errors.New("Pactfile is invalid, consumer name should not be empty.")
+)
 
 type Participant struct {
 	Name string `json:"name"`
@@ -42,4 +48,15 @@ func (p *PactFile) FileName() string {
 	consumer := strings.Replace(strings.ToLower(p.Consumer.Name), " ", "_", -1)
 	provider := strings.Replace(strings.ToLower(p.Provider.Name), " ", "_", -1)
 	return fmt.Sprintf("%s-%s.json", consumer, provider)
+}
+
+func (p *PactFile) Validate() error {
+	if p.Provider == nil || p.Provider.Name == "" {
+		return errEmptyProvider
+	}
+
+	if p.Consumer == nil || p.Consumer.Name == "" {
+		return errEmptyConsumer
+	}
+	return nil
 }

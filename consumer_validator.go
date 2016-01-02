@@ -20,10 +20,9 @@ type consumerValidator interface {
 }
 
 var (
-	errNilProviderClient       = errors.New("Provider http client cannot be nil, please provide a valid value using ServiceProvider function.")
-	errNilProviderURL          = errors.New("Provider url cannot be nil, please provide a valid value using ServiceProvider function.")
-	errEmptyProviderInPactFile = errors.New("Provider details are not available, please provide a valid pact file.")
-	errEmptyConsumerInPactFile = errors.New("Consumer details are not available, please provide a valid pact file.")
+	errNilProviderClient        = errors.New("Provider http client cannot be nil, please provide a valid value using ServiceProvider function.")
+	errNilProviderURL           = errors.New("Provider url cannot be nil, please provide a valid value using ServiceProvider function.")
+	errNotFoundProviderStateMsg = "providerState '%s' was defined by a consumer, however could not be found. Please supply this provider state."
 )
 
 type pactValidator struct {
@@ -53,10 +52,6 @@ func (v *pactValidator) ProviderService(c *http.Client, u *url.URL) {
 }
 
 func (v *pactValidator) Validate(p *io.PactFile, s map[string]*stateAction) (bool, error) {
-	if err := v.validatePactFile(p); err != nil {
-		return false, err
-	}
-
 	isValid := true
 
 	for _, i := range p.Interactions {
@@ -70,7 +65,7 @@ func (v *pactValidator) Validate(p *io.PactFile, s map[string]*stateAction) (boo
 
 		if i.State != "" {
 			if sa = s[i.State]; sa == nil {
-				return false, fmt.Errorf("providerState '%s' was defined by a consumer, however could not be found. Please supply this provider state.", i.State)
+				return false, fmt.Errorf(errNotFoundProviderStateMsg, i.State)
 			} else if err := v.executeAction(sa.setup); err != nil {
 				return false, err
 			}
@@ -105,7 +100,9 @@ func (v *pactValidator) validateInteraction(i *consumer.Interaction) (bool, erro
 		return false, err
 	}
 	resp, err := v.c.Do(req)
-	defer resp.Body.Close()
+	if resp != nil && resp.Body != nil {
+		defer resp.Body.Close()
+	}
 
 	if err != nil {
 		return false, err
@@ -123,17 +120,6 @@ func (v *pactValidator) executeAction(a Action) error {
 		if err := a(); err != nil {
 			return err
 		}
-	}
-	return nil
-}
-
-func (v *pactValidator) validatePactFile(p *io.PactFile) error {
-	if p.Provider == nil || p.Provider.Name == "" {
-		return errEmptyProviderInPactFile
-	}
-
-	if p.Consumer == nil || p.Consumer.Name == "" {
-		return errEmptyConsumerInPactFile
 	}
 	return nil
 }

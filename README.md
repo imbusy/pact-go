@@ -1,4 +1,4 @@
-# pact-go [![Build Status](https://travis-ci.org/SEEK-Jobs/pact-go.svg)](https://travis-ci.org/SEEK-Jobs/pact-go)
+# pact-go [![Build Status](https://travis-ci.org/SEEK-Jobs/pact-go.svg)](https://travis-ci.org/SEEK-Jobs/pact-go) [![Coverage Status](https://coveralls.io/repos/SEEK-Jobs/pact-go/badge.svg?branch=master&service=github)](https://coveralls.io/github/SEEK-Jobs/pact-go?branch=master)
 A Go Lang implementation of the Ruby consumer driven contract library, Pact.
 Pact is based off the specification found at https://github.com/bethesque/pact_specification.
 

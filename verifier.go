@@ -11,7 +11,7 @@ type Verifier interface {
 	ProviderState(state string, setup, teardown Action) Verifier
 	ServiceProvider(providerName string, c *http.Client, u *url.URL) Verifier
 	HonoursPactWith(consumerName string) Verifier
-	PactUri(uri string) Verifier
+	PactUri(uri string, config *PactUriConfig) Verifier
 	Verify() error
 }
 
@@ -23,12 +23,13 @@ type stateAction struct {
 }
 
 type pactFileVerfier struct {
-	stateActions map[string]*stateAction
-	provider     string
-	consumer     string
-	pactUri      string
-	validator    consumerValidator
-	config       *VerfierConfig
+	stateActions  map[string]*stateAction
+	provider      string
+	consumer      string
+	pactUri       string
+	pactUriConfig *PactUriConfig
+	validator     consumerValidator
+	config        *VerfierConfig
 }
 
 func NewPactFileVerifier(setup, teardown Action, config *VerfierConfig) Verifier {
@@ -68,7 +69,11 @@ func (v *pactFileVerfier) HonoursPactWith(consumerName string) Verifier {
 	return v
 }
 
-func (v *pactFileVerfier) PactUri(uri string) Verifier {
+func (v *pactFileVerfier) PactUri(uri string, config *PactUriConfig) Verifier {
+	if config == nil {
+		config = DefaultPactUriConfig
+	}
+	v.pactUriConfig = config
 	v.pactUri = uri
 	return v
 }
@@ -83,7 +88,6 @@ func (v *pactFileVerfier) Verify() error {
 	if err != nil {
 		return err
 	}
-
 	//validate interactions
 	if ok, err := v.validator.Validate(f, v.stateActions); err != nil {
 		return err
@@ -95,11 +99,19 @@ func (v *pactFileVerfier) Verify() error {
 }
 
 func (v *pactFileVerfier) getPactFile() (*io.PactFile, error) {
-	r := io.NewPactFileReader(v.pactUri)
+	var r io.PactReader
+	if io.IsWebUri(v.pactUri) {
+		r = io.NewPactWebReader(v.pactUri, v.pactUriConfig.AuthScheme, v.pactUriConfig.AuthValue)
+	} else {
+		r = io.NewPactFileReader(v.pactUri)
+	}
+
 	f, err := r.Read()
 	if err != nil {
 		return nil, err
-	} else if err := f.Validate(); err != nil {
+	}
+
+	if err := f.Validate(); err != nil {
 		return nil, err
 	}
 	return f, nil

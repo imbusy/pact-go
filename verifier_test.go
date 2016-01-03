@@ -2,6 +2,7 @@ package pact
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -41,16 +42,29 @@ func userAction(w http.ResponseWriter, r *http.Request, users map[int]*user) {
 	}
 }
 
+func pactServer(w http.ResponseWriter, r *http.Request) {
+	path := "./pact_examples/chrome_browser-go_api.json"
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	if _, err := w.Write(b); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+}
+
 func Test_Verifier_CanVerify_Success(t *testing.T) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/user", userHandlerWithValidData)
+	mux.HandleFunc("/getpact", pactServer)
 	server := httptest.NewServer(mux)
 
 	defer server.Close()
 	u, _ := url.Parse(server.URL)
 	v := NewPactFileVerifier(nil, nil, nil).
 		HonoursPactWith("chrome browser").
-		PactUri("./pact_examples/chrome_browser-go_api.json").
+		PactUri(server.URL+"/getpact", nil).
 		ServiceProvider("go api", &http.Client{}, u).
 		ProviderState("there is a user with id {23}", nil, nil).
 		ProviderState("there is no user with id {200}", nil, nil)
@@ -68,7 +82,7 @@ func Test_Verifier_CanVerify_Mismatch(t *testing.T) {
 	u, _ := url.Parse(server.URL)
 	v := NewPactFileVerifier(nil, nil, nil).
 		HonoursPactWith("chrome browser").
-		PactUri("./pact_examples/chrome_browser-go_api.json").
+		PactUri("./pact_examples/chrome_browser-go_api.json", nil).
 		ServiceProvider("go api", &http.Client{}, u).
 		ProviderState("there is a user with id {23}", nil, nil).
 		ProviderState("there is no user with id {200}", nil, nil)
@@ -83,7 +97,7 @@ func Test_Verifier_ThrowsError_InvalidPactUri(t *testing.T) {
 	v := NewPactFileVerifier(nil, nil, nil).
 		HonoursPactWith("consumer").
 		ServiceProvider("provider", &http.Client{}, &url.URL{}).
-		PactUri("badpath///")
+		PactUri("badpath///", nil)
 	if err := v.Verify(); err == nil {
 		t.Error("Expected bad file error")
 	} else if !strings.Contains(err.Error(), "badpath///") {

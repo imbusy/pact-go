@@ -10,6 +10,7 @@ var (
 	DefaultLogger         = log.New(os.Stderr, "\t", 0)
 	DefaultVerifierConfig = &VerfierConfig{Logger: DefaultLogger}
 	DefaultBuilderConfig  = &BuilderConfig{Logger: DefaultLogger}
+	DefaultPactUriConfig  = &PactUriConfig{}
 )
 
 //BuilderConfig configuration needed to build pacts
@@ -21,4 +22,9 @@ type BuilderConfig struct {
 //VerifierConfig configuration needed to verify pacts
 type VerfierConfig struct {
 	Logger util.Logger
+}
+
+type PactUriConfig struct {
+	AuthScheme string
+	AuthValue  string
 }

@@ -137,7 +137,7 @@ go test -v ./...
 Build your api using any web framework like Goji, Gin, Gorilla or just net/http. Ensure your pipeline is composable to simplify testing and introduce mock behaviors.
 
 ##### 2. Honour Pacts
-Create new test file in your service provider api to verify pact with the consumer.
+Create a new test file in your service provider api to verify pact with the consumer.
 
 ```go
 

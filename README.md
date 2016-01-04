@@ -71,6 +71,7 @@ Add your test method to register and verify your interactions with provider
 ```go
 
 import (
+  "testing"
   pact "github.com/SEEK-Jobs/pact-go"
   "github.com/SEEK-Jobs/pact-go/provider"
   "net/http"
@@ -79,8 +80,8 @@ import (
 func buildPact() {
   return pact.
     NewConsumerPactBuilder(&pact.Config{PactPath: "./pacts"}).
-		ServiceConsumer("my consumer").
-		HasPactWith("my provider")
+		ServiceConsumer("consumer client").
+		HasPactWith("provider api")
 }
 
 func TestPactWithProvider(t *testing.T) {
@@ -127,6 +128,58 @@ func TestPactWithProvider(t *testing.T) {
 ```
 
 ##### 4. Run your test
+```shell
+go test -v ./...
+```
+
+#### Service Provider
+##### 1. Build the API
+Build your api using any web framework like Goji, Gin, Gorilla or just net/http. Ensure your pipeline is composable to simplify testing and introduce mock behaviors.
+
+##### 2. Honour Pacts
+Create new test file in your service provider api to verify pact with the consumer.
+
+```go
+
+import (
+  "testing"
+  pact "github.com/SEEK-Jobs/pact-go"
+  "github.com/SEEK-Jobs/pact-go/provider"
+  "net/httptest"
+)
+
+func TestProviderHonoursPactWithConsumer(t *testing.T) {
+  //Stand up a test server with the mux which has all your
+  //middlewares and handlers registered, for e.g.
+  //mux := http.NewServeMux()
+	//mux.HandleFunc("/user", handler)
+  server := httptest.NewServer(mux)
+  defer server.Close()
+  u, _ := url.Parse(server.URL)
+
+  verifier := pact.NewPactFileVerifier(nil, nil, pact.DefaultVerifierConfig).
+    HonoursPactWith("consumer client").
+    ServiceProvider("provider api", &http.Client{}, u).
+    //pact uri could be a local file
+    PactUri("./pacts/consumer_client-provider_api.json", nil).
+    //or could be a web url e.g. pact broker. You can also provide authorisation value in the config parameter
+    PactUri("http://pact-broker/pacts/provider/provider%20api/consumer/consumer%20client/version/latest", nil).
+    ProviderState("there is a resource with id 23", ensureResourceExists, nil)
+
+  if err := v.Verify(); err != nil {
+		t.Error(err)
+	}
+}
+
+func ensureResourceExists() error {
+  //implemenation to add the resource, so the api could return the expected data
+  return nil
+}
+```
+
+#### 3. Run your test
+Run your test to verify all the interactions.
+
 ```shell
 go test -v ./...
 ```

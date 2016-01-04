@@ -144,7 +144,6 @@ Create a new test file in your service provider api to verify pact with the cons
 import (
   "testing"
   pact "github.com/SEEK-Jobs/pact-go"
-  "github.com/SEEK-Jobs/pact-go/provider"
   "net/httptest"
 )
 

@@ -32,6 +32,8 @@ type pactFileVerfier struct {
 	config        *VerfierConfig
 }
 
+//NewPactFileVerifier creates a new pact verifier. The setup & teardown actions
+//get executed before each interaction is verified.
 func NewPactFileVerifier(setup, teardown Action, config *VerfierConfig) Verifier {
 	if config == nil {
 		config = DefaultVerifierConfig
@@ -50,12 +52,14 @@ var (
 	errVerficationFailed = errors.New("Failed to verify the pact, please see the log for more details.")
 )
 
+//ServiceProvider provides the information needed to verify the interactions with service provider
 func (v *pactFileVerfier) ServiceProvider(providerName string, c *http.Client, u *url.URL) Verifier {
 	v.provider = providerName
 	v.validator.ProviderService(c, u)
 	return v
 }
 
+//ProviderState sets the setup and teardown action to be executed before a interaction with specific state gets verified
 func (v *pactFileVerfier) ProviderState(state string, setup, teardown Action) Verifier {
 	//sacrificed empty state validation in favour of chaining
 	if state != "" {
@@ -64,11 +68,13 @@ func (v *pactFileVerfier) ProviderState(state string, setup, teardown Action) Ve
 	return v
 }
 
+//HonoursPactWith consumer with which pact needs to be honoured
 func (v *pactFileVerfier) HonoursPactWith(consumerName string) Verifier {
 	v.consumer = consumerName
 	return v
 }
 
+//PactUri sets the uri to get the pact file
 func (v *pactFileVerfier) PactUri(uri string, config *PactUriConfig) Verifier {
 	if config == nil {
 		config = DefaultPactUriConfig
@@ -78,6 +84,7 @@ func (v *pactFileVerfier) PactUri(uri string, config *PactUriConfig) Verifier {
 	return v
 }
 
+//Verify verifies all the interactions of consumer against the provider
 func (v *pactFileVerfier) Verify() error {
 	if err := v.verifyInternalState(); err != nil {
 		return err

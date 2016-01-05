@@ -9,7 +9,7 @@ import (
 	"github.com/SEEK-Jobs/pact-go/consumer"
 )
 
-const pactSpecification = "1.1.0"
+const pactSpecificationVersion = "1.1.0"
 
 var (
 	errEmptyProvider = errors.New("Pactfile is invalid, provider name should not be empty.")
@@ -21,7 +21,7 @@ type Participant struct {
 }
 
 type metadata struct {
-	PactSpecification string `json:"pactSpecification"`
+	PactSpecificationVersion string `json:"pactSpecificationVersion"`
 }
 
 type PactFile struct {
@@ -36,7 +36,7 @@ func NewPactFile(consumer string, provider string, interactions []*consumer.Inte
 		Consumer:     &Participant{Name: consumer},
 		Provider:     &Participant{Name: provider},
 		Interactions: interactions,
-		Metadata:     &metadata{PactSpecification: pactSpecification},
+		Metadata:     &metadata{PactSpecificationVersion: pactSpecificationVersion},
 	}
 }
 

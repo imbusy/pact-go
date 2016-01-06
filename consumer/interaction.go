@@ -56,7 +56,7 @@ func (i *Interaction) ToHTTPRequest(baseURL string) (*http.Request, error) {
 	}
 
 	bodyReader := getReader(body)
-	req, err := http.NewRequest(i.Request.Method, u.String(), bodyReader)
+	req, err := http.NewRequest(strings.ToUpper(i.Request.Method), u.String(), bodyReader)
 
 	if err != nil {
 		return nil, err

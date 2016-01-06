@@ -87,9 +87,12 @@ func (p *Request) UnmarshalJSON(b []byte) error {
 		r.Query = query
 	}
 
-	if headers, ok := obj["headers"].(map[string]string); ok {
+	if headers, ok := obj["headers"].(map[string]interface{}); ok {
+		r.Headers = make(http.Header)
 		for key, val := range headers {
-			r.Headers.Add(key, val)
+			if str, ok := val.(string); ok {
+				r.Headers.Add(key, str)
+			}
 		}
 	}
 

@@ -12,8 +12,9 @@ import (
 const pactSpecificationVersion = "1.1.0"
 
 var (
-	errEmptyProvider = errors.New("Pactfile is invalid, provider name should not be empty.")
-	errEmptyConsumer = errors.New("Pactfile is invalid, consumer name should not be empty.")
+	errEmptyProvider    = errors.New("Pactfile is invalid, provider name should not be empty.")
+	errEmptyConsumer    = errors.New("Pactfile is invalid, consumer name should not be empty.")
+	errIncompatiblePact = fmt.Errorf("Incompatible pact specification! We only support version %s.", pactSpecificationVersion)
 )
 
 type Participant struct {
@@ -58,5 +59,10 @@ func (p *PactFile) Validate() error {
 	if p.Consumer == nil || p.Consumer.Name == "" {
 		return errEmptyConsumer
 	}
+
+	if p.Metadata.PactSpecificationVersion != pactSpecificationVersion {
+		return errIncompatiblePact
+	}
+
 	return nil
 }

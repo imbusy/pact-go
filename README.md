@@ -2,7 +2,7 @@
 A Go Lang implementation of the Ruby consumer driven contract library, Pact.
 Pact is based off the specification found at https://github.com/bethesque/pact_specification.
 
-Currently pact-go is compatible with v1.1 of [pact specification](https://github.com/pact-foundation/pact-specification/tree/version-1.1). At this stage only the consumer dsl is available to generate and verify pacts. We will be adding the provider side of functionality soon.
+Currently pact-go is compatible with v1.1 of [pact specification](https://github.com/pact-foundation/pact-specification/tree/version-1.1). The package is fairly stable but in beta phase, so potentially there could be breaking changes in future.
 
 Read more about Pact and the problems it solves at [https://github.com/realestate-com-au/pact](https://github.com/realestate-com-au/pact)
 

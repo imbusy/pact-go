@@ -19,14 +19,3 @@ func Test_FileReader_BadFilePath_ShouldReturnError(t *testing.T) {
 		t.Error("expected error")
 	}
 }
-
-func Test_FileReader_InvalidSpec_ShouldReturnError(t *testing.T) {
-	path := "./pactWrongSpec.json"
-	r := NewPactFileReader(path)
-
-	if _, err := r.Read(); err == nil {
-		t.Error("expected not supported pact error")
-	} else if err != errIncompatiblePact {
-		t.Error("got the wrong error")
-	}
-}

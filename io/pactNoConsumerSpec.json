@@ -1,7 +1,4 @@
 {
-	"consumer": {
-		"name": "consumer"
-	},
 	"provider": {
 		"name": "provider"
 	},
@@ -33,6 +30,6 @@
 		}
 	],
 	"metaData": {
-		"pactSpecificationVersion": "2.0.0"
+		"pactSpecificationVersion": "1.1.0"
 	}
 }

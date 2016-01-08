@@ -9,11 +9,12 @@ import (
 	"github.com/SEEK-Jobs/pact-go/consumer"
 )
 
-const pactSpecification = "1.1.0"
+const pactSpecificationVersion = "1.1.0"
 
 var (
-	errEmptyProvider = errors.New("Pactfile is invalid, provider name should not be empty.")
-	errEmptyConsumer = errors.New("Pactfile is invalid, consumer name should not be empty.")
+	errEmptyProvider    = errors.New("Pactfile is invalid, provider name should not be empty.")
+	errEmptyConsumer    = errors.New("Pactfile is invalid, consumer name should not be empty.")
+	errIncompatiblePact = fmt.Errorf("Incompatible pact specification! We only support version %s.", pactSpecificationVersion)
 )
 
 type Participant struct {
@@ -21,7 +22,7 @@ type Participant struct {
 }
 
 type metadata struct {
-	PactSpecification string `json:"pactSpecification"`
+	PactSpecificationVersion string `json:"pactSpecificationVersion"`
 }
 
 type PactFile struct {
@@ -36,7 +37,7 @@ func NewPactFile(consumer string, provider string, interactions []*consumer.Inte
 		Consumer:     &Participant{Name: consumer},
 		Provider:     &Participant{Name: provider},
 		Interactions: interactions,
-		Metadata:     &metadata{PactSpecification: pactSpecification},
+		Metadata:     &metadata{PactSpecificationVersion: pactSpecificationVersion},
 	}
 }
 
@@ -58,5 +59,10 @@ func (p *PactFile) Validate() error {
 	if p.Consumer == nil || p.Consumer.Name == "" {
 		return errEmptyConsumer
 	}
+
+	if p.Metadata.PactSpecificationVersion != pactSpecificationVersion {
+		return errIncompatiblePact
+	}
+
 	return nil
 }

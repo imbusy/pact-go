@@ -57,13 +57,13 @@ func Test_ValidResponse_WritesToHttpResponse(t *testing.T) {
 	interaction.WriteToHTTPResponse(rec)
 
 	if rec.Code != interaction.Response.Status {
-		t.Errorf("Expected status %v, but recieved %v", interaction.Response.Status, rec.Code)
+		t.Errorf("Expected status %v, but received %v", interaction.Response.Status, rec.Code)
 	}
 
 	respHeader := rec.Header()
 	for header, val := range interaction.Response.Headers {
 		if val[0] != respHeader.Get(header) {
-			t.Errorf("Expected header %s to have %s, but recieved %s", header, val[0], respHeader.Get(header))
+			t.Errorf("Expected header %s to have %s, but received %s", header, val[0], respHeader.Get(header))
 		}
 	}
 
@@ -76,7 +76,7 @@ func Test_ValidResponse_WritesToHttpResponse(t *testing.T) {
 	actualObj := rec.Body.Bytes()
 
 	if bytes.Compare(expectedObj, actualObj) != 0 {
-		t.Error("Expected body is different from the recieved body")
+		t.Error("Expected body is different from the received body")
 	}
 }
 

@@ -13,7 +13,7 @@ var (
 	diffMisMatchAt = "mismatch at %s: %s"
 	diffExpected   = "expected:"
 	diffVal        = "\t%#v"
-	diffActual     = "recieved:"
+	diffActual     = "received:"
 	diffHeading    = "%s%s%s"
 )
 

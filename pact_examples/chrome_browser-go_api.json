@@ -40,6 +40,6 @@
 		}
 	],
 	"metaData": {
-		"pactSpecification": "1.1.0"
+		"pactSpecificationVersion": "1.1.0"
 	}
 }

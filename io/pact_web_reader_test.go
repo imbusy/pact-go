@@ -1,7 +1,6 @@
 package io
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -33,12 +32,13 @@ func Test_WebReader_ReadsPactWithoutAuth(t *testing.T) {
 }
 
 func Test_WebReader_ReadsPactWithAuth(t *testing.T) {
-	authSchme := "Basic"
-	authVal := "some-encrypted-token"
-	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	username := "a-pact-user"
+	password := "a-secret-password"
 
-		authHeader := r.Header.Get("Authorisation")
-		if authHeader != fmt.Sprintf("%s %s", authSchme, authVal) {
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		actualUsername, actualPassword, ok := r.BasicAuth()
+
+		if !ok || username != actualUsername || password != actualPassword {
 			w.WriteHeader(http.StatusUnauthorized)
 		}
 
@@ -56,11 +56,16 @@ func Test_WebReader_ReadsPactWithAuth(t *testing.T) {
 	}))
 	defer s.Close()
 
-	r := NewPactWebReader(s.URL, authSchme, authVal)
+	r := NewPactWebReader(s.URL, username, password)
 	if f, err := r.Read(); err != nil {
 		t.Error(err)
 	} else if f == nil {
 		t.Error("expected valid pact file")
+	}
+
+	r = NewPactWebReader(s.URL, username, "incorrect password")
+	if _, err := r.Read(); err == nil {
+		t.Error("expected 401 error")
 	}
 }
 

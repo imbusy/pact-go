@@ -25,6 +25,6 @@ type VerfierConfig struct {
 }
 
 type PactUriConfig struct {
-	AuthScheme string
-	AuthValue  string
+	Username string
+	Password string
 }

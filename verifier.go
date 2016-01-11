@@ -108,7 +108,7 @@ func (v *pactFileVerfier) Verify() error {
 func (v *pactFileVerfier) getPactFile() (*io.PactFile, error) {
 	var r io.PactReader
 	if io.IsWebUri(v.pactUri) {
-		r = io.NewPactWebReader(v.pactUri, v.pactUriConfig.AuthScheme, v.pactUriConfig.AuthValue)
+		r = io.NewPactWebReader(v.pactUri, v.pactUriConfig.Username, v.pactUriConfig.Password)
 	} else {
 		r = io.NewPactFileReader(v.pactUri)
 	}

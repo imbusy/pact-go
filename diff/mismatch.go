@@ -28,8 +28,8 @@ const (
 )
 
 var typeMsgs = map[mismatchType]string{
-	mType:            "type mismatch expected %s recieved %s",
-	mLen:             "length mismatch, expected %d recieved %d",
+	mType:            "type mismatch expected %s received %s",
+	mLen:             "length mismatch, expected %d received %d",
 	mUnequal:         "unequal",
 	mValidty:         "validity mismatch",
 	mFieldUnexpected: "unexpected field %s",

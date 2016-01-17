@@ -84,7 +84,7 @@ func Test_MatchingInteractionNotFound_Returns404(t *testing.T) {
 	}
 
 	if bodyText != errNotFound.Error() {
-		t.Errorf("The expected response was '%s' but recieved '%s'", errNotFound.Error(), bodyText)
+		t.Errorf("The expected response was '%s' but received '%s'", errNotFound.Error(), bodyText)
 	}
 }
 

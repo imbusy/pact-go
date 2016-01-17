@@ -8,17 +8,17 @@ import (
 )
 
 type pactWebReader struct {
-	url        string
-	authScheme string
-	authVal    string
+	url      string
+	username string
+	password string
 }
 
 func IsWebUri(url string) bool {
 	return strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://")
 }
 
-func NewPactWebReader(url, authScheme, authVal string) PactReader {
-	return &pactWebReader{url: url, authScheme: authScheme, authVal: authVal}
+func NewPactWebReader(url, username, password string) PactReader {
+	return &pactWebReader{url: url, username: username, password: password}
 }
 
 func (p *pactWebReader) Read() (*PactFile, error) {
@@ -28,8 +28,8 @@ func (p *pactWebReader) Read() (*PactFile, error) {
 	}
 
 	req.Header.Add("Accept", "application/json")
-	if p.authScheme != "" && p.authVal != "" {
-		req.Header.Add("Authorisation", fmt.Sprintf("%s %s", p.authScheme, p.authVal))
+	if p.username != "" && p.password != "" {
+		req.SetBasicAuth(p.username, p.password)
 	}
 
 	c := &http.Client{}

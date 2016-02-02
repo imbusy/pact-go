@@ -59,7 +59,7 @@ import (
   pact "github.com/SEEK-Jobs/pact-go"
 )
 
-func buildPact() {
+func buildPact() pact.Builder {
   return pact.
     NewConsumerPactBuilder(&pact.Config{PactPath: "./pacts"}).
 		ServiceConsumer("my consumer").
@@ -77,7 +77,8 @@ import (
   "net/http"
 )
 
-func buildPact() {
+func buildPact() pact.Builder 
+{
   return pact.
     NewConsumerPactBuilder(&pact.Config{PactPath: "./pacts"}).
 		ServiceConsumer("consumer client").

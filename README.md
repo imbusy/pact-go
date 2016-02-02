@@ -77,8 +77,7 @@ import (
   "net/http"
 )
 
-func buildPact() pact.Builder 
-{
+func buildPact() pact.Builder {
   return pact.
     NewConsumerPactBuilder(&pact.Config{PactPath: "./pacts"}).
 		ServiceConsumer("consumer client").

@@ -1,6 +1,9 @@
 all: compile
 
-vet:
+dependencies:
+	go get ./...
+
+vet: dependencies
 	go vet -v ./...
 
 test: vet
@@ -11,4 +14,4 @@ compile: test
 
 run: all
 
-.PHONY: all compile test vet
+.PHONY: all compile test vet dependencies

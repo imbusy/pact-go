@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/SEEK-Jobs/pact-go/consumer"
+	version "github.com/hashicorp/go-version"
 )
 
 const pactSpecificationVersion = "1.1.0"
@@ -60,7 +61,18 @@ func (p *PactFile) Validate() error {
 		return errEmptyConsumer
 	}
 
-	if p.Metadata.PactSpecificationVersion != pactSpecificationVersion {
+	psv, err := version.NewVersion(pactSpecificationVersion)
+	if err != nil {
+		return err
+	}
+
+	fpsv, err := version.NewVersion(p.Metadata.PactSpecificationVersion)
+	if err != nil {
+		return err
+	}
+
+	//should be backwards compatible with version 1.0.0
+	if fpsv.GreaterThan(psv) {
 		return errIncompatiblePact
 	}
 

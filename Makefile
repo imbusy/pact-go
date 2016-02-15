@@ -1,9 +1,9 @@
 all: compile
 
-go-deps:
+get-deps:
 	go get ./...
 
-vet: go-deps
+vet: get-deps
 	go vet -v ./...
 
 test: vet
@@ -14,4 +14,4 @@ compile: test
 
 run: all
 
-.PHONY: all compile test vet go-deps
+.PHONY: all compile test vet get-deps

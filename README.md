@@ -69,33 +69,34 @@ func buildPact() pact.Builder {
 ##### 3. Add your tests
 Add your test method to register and verify your interactions with provider
 ```go
+package client
 
 import (
-  "testing"
-  pact "github.com/SEEK-Jobs/pact-go"
-  "github.com/SEEK-Jobs/pact-go/provider"
-  "net/http"
+	pact "github.com/SEEK-Jobs/pact-go"
+	"github.com/SEEK-Jobs/pact-go/provider"
+	"net/http"
+	"testing"
 )
 
 func buildPact() pact.Builder {
-  return pact.
-    NewConsumerPactBuilder(&pact.Config{PactPath: "./pacts"}).
+	return pact.
+		NewConsumerPactBuilder(&pact.BuilderConfig{PactPath: "./pacts"}).
 		ServiceConsumer("consumer client").
 		HasPactWith("provider api")
 }
 
 func TestPactWithProvider(t *testing.T) {
-  builder := buildPact()
-  ms, msUrl := builder.GetMockProviderService()
+	builder := buildPact()
+	ms, msUrl := builder.GetMockProviderService()
 
-  request := provider.NewJSONRequest("GET", "/23", nil, nil)
+	request := provider.NewJSONRequest("GET", "/23", "", nil)
 	header := make(http.Header)
 	header.Add("content-type", "application/json")
 	response := provider.NewJSONResponse(200, header)
-	response.SetBody(`{"name": "John"}`)
+	response.SetBody(`{"Name": "John"}`)
 
-  //Register interaction for this test scope
-  if err := ps.Given("there is a resource with id 23").
+	//Register interaction for this test scope
+	if err := ms.Given("there is a resource with id 23").
 		UponReceiving("get request for resource with id 23").
 		With(*request).
 		WillRespondWith(*response); err != nil {
@@ -103,25 +104,24 @@ func TestPactWithProvider(t *testing.T) {
 		t.FailNow()
 	}
 
-  //test
-  client := &ProviderClient{baseUrl: msUrl}
-  if res, err := client.GetResource(23); err != nil {
-    t.Error(err)
-    t.FailNow()
-  }
-
-  //Verify registered interaction
-  if err := ms.VerifyInteractions(); err != nil {
+	//test
+	client := &ProviderAPIClient{baseURL: msUrl}
+	if _, err := client.GetResource(23); err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 
-  //Clear interaction for this test scope, if you need to register and verify another interaction for another test scope
-  ms.ClearInteractions()
+	//Verify registered interaction
+	if err := ms.VerifyInteractions(); err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
 
+	//Clear interaction for this test scope, if you need to register and verify another interaction for another test scope
+	ms.ClearInteractions()
 
-  //Finally, build to produce the pact json file
-  if err := builder.Build(); err != nil {
+	//Finally, build to produce the pact json file
+	if err := builder.Build(); err != nil {
 		t.Error(err)
 	}
 }
@@ -140,39 +140,52 @@ Build your api using any web framework like Goji, Gin, Gorilla or just net/http.
 Create a new test file in your service provider api to verify pact with the consumer.
 
 ```go
+package provider
 
 import (
-  "testing"
-  pact "github.com/SEEK-Jobs/pact-go"
-  "net/httptest"
+	"encoding/json"
+	"fmt"
+	pact "github.com/SEEK-Jobs/pact-go"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
+	"testing"
 )
 
+type Resource struct {
+	Name string
+}
+
 func TestProviderHonoursPactWithConsumer(t *testing.T) {
-  //Stand up a test server with the mux which has all your
-  //middlewares and handlers registered, for e.g.
-  //mux := http.NewServeMux()
-	//mux.HandleFunc("/user", handler)
-  server := httptest.NewServer(mux)
-  defer server.Close()
-  u, _ := url.Parse(server.URL)
+	//Stand up a test server with the mux which has all your
+	//middlewares and handlers registered, for e.g.
+	mux := http.NewServeMux()
+	mux.HandleFunc("/23", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		encoder := json.NewEncoder(w)
+		fmt.Fprint(w, encoder.Encode(Resource{"John"}))
+	})
+	server := httptest.NewServer(mux)
+	defer server.Close()
+	u, _ := url.Parse(server.URL)
 
-  verifier := pact.NewPactFileVerifier(nil, nil, pact.DefaultVerifierConfig).
-    HonoursPactWith("consumer client").
-    ServiceProvider("provider api", &http.Client{}, u).
-    //pact uri could be a local file
-    PactUri("./pacts/consumer_client-provider_api.json", nil).
-    //or could be a web url e.g. pact broker. You can also provide authorisation value in the config parameter
-    PactUri("http://pact-broker/pacts/provider/provider%20api/consumer/consumer%20client/version/latest", nil).
-    ProviderState("there is a resource with id 23", ensureResourceExists, nil)
+	verifier := pact.NewPactFileVerifier(nil, nil, pact.DefaultVerifierConfig).
+		HonoursPactWith("consumer client").
+		ServiceProvider("provider api", &http.Client{}, u).
+		//pact uri could be a local file
+		PactUri("../pacts/consumer_client-provider_api.json", nil).
+		//or could be a web url e.g. pact broker. You can also provide authorisation value in the config parameter
+		//PactUri("http://pact-broker/pacts/provider/provider%20api/consumer/consumer%20client/version/latest", nil).
+		ProviderState("there is a resource with id 23", ensureResourceExists, nil)
 
-  if err := v.Verify(); err != nil {
+	if err := verifier.Verify(); err != nil {
 		t.Error(err)
 	}
 }
 
 func ensureResourceExists() error {
-  //implemenation to add the resource, so the api could return the expected data
-  return nil
+	//implemenation to add the resource, so the api could return the expected data
+	return nil
 }
 ```
 

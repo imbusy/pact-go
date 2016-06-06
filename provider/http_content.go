@@ -30,9 +30,9 @@ func (c *jsonContent) GetData() ([]byte, error) {
 }
 
 func (c *jsonContent) GetBody() interface{} {
-	if len(c.data) > 0 {
+	if c.data != nil {
 		return c.data
-	} else if len(c.sliceData) > 0 {
+	} else if c.sliceData != nil {
 		return c.sliceData
 	} else {
 		return nil

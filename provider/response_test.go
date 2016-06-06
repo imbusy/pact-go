@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test_Response_MarshalJSON_BodyShouldBeEmptyArray(t *testing.T) {
+func Test_Response_MarshalJSON_BodyShouldExist(t *testing.T) {
 	header := make(http.Header)
 	header.Add("content-type", "application/json")
 	response := NewJSONResponse(200, header)
@@ -15,6 +15,6 @@ func Test_Response_MarshalJSON_BodyShouldBeEmptyArray(t *testing.T) {
 	result, _ := response.MarshalJSON()
 
 	if !bytes.Contains(result, []byte(`"body"`)) {
-		t.Error(t, "Response should contain body with an empty array.")
+		t.Error(t, "Response should contain body field.")
 	}
 }

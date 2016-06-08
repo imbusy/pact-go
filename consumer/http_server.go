@@ -3,7 +3,7 @@ package consumer
 import (
 	"errors"
 	"fmt"
-	"github.com/SEEK-Jobs/pact-go/comparers"
+	"github.com/imbusy/pact-go/comparers"
 	"net/http"
 	"net/http/httptest"
 	"reflect"

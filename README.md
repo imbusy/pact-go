@@ -1,4 +1,4 @@
-# pact-go [![Build Status](https://travis-ci.org/SEEK-Jobs/pact-go.svg)](https://travis-ci.org/SEEK-Jobs/pact-go) [![Coverage Status](https://coveralls.io/repos/SEEK-Jobs/pact-go/badge.svg?branch=master&service=github)](https://coveralls.io/github/SEEK-Jobs/pact-go?branch=master)
+# pact-go
 A Go Lang implementation of the Ruby consumer driven contract library, Pact.
 Pact is based off the specification found at https://github.com/bethesque/pact_specification.
 
@@ -9,7 +9,7 @@ Read more about Pact and the problems it solves at [https://github.com/realestat
 Please feel free to contribute, we do accept pull requests.
 ### Installing
 ```shell
-go get github.com/SEEK-Jobs/pact-go
+go get github.com/imbusy/pact-go
 ```
 
 ### Usage
@@ -56,7 +56,7 @@ func (c *ProviderAPIClient) GetResource(id int)  (*Resource, error) {
 In your test file describe and configure your pact
 ```go
 import (
-  pact "github.com/SEEK-Jobs/pact-go"
+  pact "github.com/imbusy/pact-go"
 )
 
 func buildPact() pact.Builder {
@@ -72,8 +72,8 @@ Add your test method to register and verify your interactions with provider
 package client
 
 import (
-	pact "github.com/SEEK-Jobs/pact-go"
-	"github.com/SEEK-Jobs/pact-go/provider"
+	pact "github.com/imbusy/pact-go"
+	"github.com/imbusy/pact-go/provider"
 	"net/http"
 	"testing"
 )
@@ -137,7 +137,8 @@ go test -v ./...
 Build your api using any web framework like Goji, Gin, Gorilla or just net/http. Ensure your pipeline is composable to simplify testing and introduce mock behaviors.
 
 ##### 2. Honour Pacts
-Create a new test file in your service provider api to verify pact with the consumer.
+Create a new test file in your service provider api to verify pact with the consumer. Each test should contain one provider state. When you are done verifying all the
+individual states, verify that all states were tested.
 
 ```go
 package provider
@@ -145,7 +146,7 @@ package provider
 import (
 	"encoding/json"
 	"fmt"
-	pact "github.com/SEEK-Jobs/pact-go"
+	pact "github.com/imbusy/pact-go"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -171,14 +172,18 @@ func TestProviderHonoursPactWithConsumer(t *testing.T) {
 
 	verifier := pact.NewPactFileVerifier(nil, nil, pact.DefaultVerifierConfig).
 		HonoursPactWith("consumer client").
-		ServiceProvider("provider api", &http.Client{}, u).
+		ServiceProvider("provider api").
 		//pact uri could be a local file
 		PactUri("../pacts/consumer_client-provider_api.json", nil).
 		//or could be a web url e.g. pact broker. You can also provide authorisation value in the config parameter
 		//PactUri("http://pact-broker/pacts/provider/provider%20api/consumer/consumer%20client/version/latest", nil).
 		ProviderState("there is a resource with id 23", ensureResourceExists, nil)
 
-	if err := verifier.Verify(); err != nil {
+	if err := verifier.Verify(&http.Client{}, u); err != nil {
+		t.Error(err)
+	}
+
+	if err := verifier.VerifyAllStatesTested(); err != nil {
 		t.Error(err)
 	}
 }

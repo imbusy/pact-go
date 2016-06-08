@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/SEEK-Jobs/pact-go/provider"
+	"github.com/imbusy/pact-go/provider"
 )
 
 func Test_InvalidUrl_MappingToHttpRequestFails(t *testing.T) {

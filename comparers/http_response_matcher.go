@@ -2,8 +2,8 @@ package comparers
 
 import (
 	"bytes"
-	"github.com/SEEK-Jobs/pact-go/diff"
-	"github.com/SEEK-Jobs/pact-go/provider"
+	"github.com/imbusy/pact-go/diff"
+	"github.com/imbusy/pact-go/provider"
 	"io"
 	"net/http"
 )

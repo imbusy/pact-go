@@ -1,7 +1,7 @@
 package comparers
 
 import (
-	"github.com/SEEK-Jobs/pact-go/diff"
+	"github.com/imbusy/pact-go/diff"
 	"net/url"
 )
 

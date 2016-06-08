@@ -1,7 +1,7 @@
 package diff
 
 import (
-	"github.com/SEEK-Jobs/pact-go/util"
+	"github.com/imbusy/pact-go/util"
 )
 
 const (

@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/SEEK-Jobs/pact-go/consumer"
-	"github.com/SEEK-Jobs/pact-go/provider"
+	"github.com/imbusy/pact-go/consumer"
+	"github.com/imbusy/pact-go/provider"
 )
 
 func Test_Writer_InvalidPath_ShouldThrowError(t *testing.T) {

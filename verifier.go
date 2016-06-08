@@ -2,17 +2,23 @@ package pact
 
 import (
 	"errors"
-	"github.com/SEEK-Jobs/pact-go/io"
+	"fmt"
+	"github.com/imbusy/pact-go/io"
 	"net/http"
 	"net/url"
 )
 
+var (
+	errNotFoundProviderStateMsg = "providerState '%s' was defined by a consumer, however could not be found. Please supply this provider state."
+)
+
 type Verifier interface {
 	ProviderState(state string, setup, teardown Action) Verifier
-	ServiceProvider(providerName string, c *http.Client, u *url.URL) Verifier
+	ServiceProvider(providerName string) Verifier
 	HonoursPactWith(consumerName string) Verifier
 	PactUri(uri string, config *PactUriConfig) Verifier
-	Verify() error
+	Verify(c *http.Client, u *url.URL) error
+	VerifyAllStatesTested() error
 }
 
 type Action func() error
@@ -24,6 +30,7 @@ type stateAction struct {
 
 type pactFileVerfier struct {
 	stateActions  map[string]*stateAction
+	testedStates  map[string]bool
 	provider      string
 	consumer      string
 	pactUri       string
@@ -43,6 +50,7 @@ func NewPactFileVerifier(setup, teardown Action, config *VerfierConfig) Verifier
 		validator:    newConsumerValidator(setup, teardown, config.Logger),
 		config:       config,
 		stateActions: make(map[string]*stateAction),
+		testedStates: make(map[string]bool),
 	}
 }
 
@@ -53,19 +61,30 @@ var (
 )
 
 //ServiceProvider provides the information needed to verify the interactions with service provider
-func (v *pactFileVerfier) ServiceProvider(providerName string, c *http.Client, u *url.URL) Verifier {
+func (v *pactFileVerfier) ServiceProvider(providerName string) Verifier {
 	v.provider = providerName
-	v.validator.ProviderService(c, u)
 	return v
 }
 
 //ProviderState sets the setup and teardown action to be executed before a interaction with specific state gets verified
 func (v *pactFileVerfier) ProviderState(state string, setup, teardown Action) Verifier {
+	v.testedStates[state] = true
+
+	verifier := &pactFileVerfier{
+		stateActions:  make(map[string]*stateAction),
+		provider:      v.provider,
+		consumer:      v.consumer,
+		pactUri:       v.pactUri,
+		pactUriConfig: v.pactUriConfig,
+		validator:     v.validator,
+		config:        v.config,
+	}
+
 	//sacrificed empty state validation in favour of chaining
 	if state != "" {
-		v.stateActions[state] = &stateAction{setup: setup, teardown: teardown}
+		verifier.stateActions[state] = &stateAction{setup: setup, teardown: teardown}
 	}
-	return v
+	return verifier
 }
 
 //HonoursPactWith consumer with which pact needs to be honoured
@@ -85,7 +104,8 @@ func (v *pactFileVerfier) PactUri(uri string, config *PactUriConfig) Verifier {
 }
 
 //Verify verifies all the interactions of consumer against the provider
-func (v *pactFileVerfier) Verify() error {
+func (v *pactFileVerfier) Verify(c *http.Client, u *url.URL) error {
+	v.validator.ProviderService(c, u)
 	if err := v.verifyInternalState(); err != nil {
 		return err
 	}
@@ -102,6 +122,21 @@ func (v *pactFileVerfier) Verify() error {
 		return errVerficationFailed
 	}
 
+	return nil
+}
+
+//Verify verifies all the interactions of consumer against the provider
+func (v *pactFileVerfier) VerifyAllStatesTested() error {
+	//get pact file
+	f, err := v.getPactFile()
+	if err != nil {
+		return err
+	}
+	for _, i := range f.Interactions {
+		if _, ok := v.testedStates[i.State]; !ok {
+			return fmt.Errorf(errNotFoundProviderStateMsg, i.State)
+		}
+	}
 	return nil
 }
 

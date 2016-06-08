@@ -1,9 +1,9 @@
 package pact
 
 import (
-	"github.com/SEEK-Jobs/pact-go/consumer"
-	"github.com/SEEK-Jobs/pact-go/io"
-	"github.com/SEEK-Jobs/pact-go/provider"
+	"github.com/imbusy/pact-go/consumer"
+	"github.com/imbusy/pact-go/io"
+	"github.com/imbusy/pact-go/provider"
 )
 
 //ProviderService - Interface to register and verify interaactions between consumer and service provider.

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SEEK-Jobs/pact-go/provider"
+	"github.com/imbusy/pact-go/provider"
 )
 
 func Test_MatchingInteractionFound_ReturnsCorrectResponse(t *testing.T) {

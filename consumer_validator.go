@@ -3,11 +3,11 @@ package pact
 import (
 	"errors"
 	"fmt"
-	"github.com/SEEK-Jobs/pact-go/comparers"
-	"github.com/SEEK-Jobs/pact-go/consumer"
-	"github.com/SEEK-Jobs/pact-go/diff"
-	"github.com/SEEK-Jobs/pact-go/io"
-	"github.com/SEEK-Jobs/pact-go/util"
+	"github.com/imbusy/pact-go/comparers"
+	"github.com/imbusy/pact-go/consumer"
+	"github.com/imbusy/pact-go/diff"
+	"github.com/imbusy/pact-go/io"
+	"github.com/imbusy/pact-go/util"
 
 	"net/http"
 	"net/url"
@@ -22,7 +22,6 @@ type consumerValidator interface {
 var (
 	errNilProviderClient        = errors.New("Provider http client cannot be nil, please provide a valid value using ServiceProvider function.")
 	errNilProviderURL           = errors.New("Provider url cannot be nil, please provide a valid value using ServiceProvider function.")
-	errNotFoundProviderStateMsg = "providerState '%s' was defined by a consumer, however could not be found. Please supply this provider state."
 )
 
 type pactValidator struct {
@@ -65,7 +64,7 @@ func (v *pactValidator) Validate(p *io.PactFile, s map[string]*stateAction) (boo
 
 		if i.State != "" {
 			if sa = s[i.State]; sa == nil {
-				return false, fmt.Errorf(errNotFoundProviderStateMsg, i.State)
+				continue
 			} else if err := v.executeAction(sa.setup); err != nil {
 				return false, err
 			}

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/SEEK-Jobs/pact-go/provider"
+	"github.com/imbusy/pact-go/provider"
 )
 
 func Test_Builder_CanBuild(t *testing.T) {

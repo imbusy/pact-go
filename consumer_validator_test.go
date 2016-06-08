@@ -2,10 +2,9 @@ package pact
 
 import (
 	"errors"
-	"fmt"
-	"github.com/SEEK-Jobs/pact-go/consumer"
-	"github.com/SEEK-Jobs/pact-go/io"
-	"github.com/SEEK-Jobs/pact-go/provider"
+	"github.com/imbusy/pact-go/consumer"
+	"github.com/imbusy/pact-go/io"
+	"github.com/imbusy/pact-go/provider"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -24,21 +23,6 @@ func Test_Validator_IsInAStateToValidate(t *testing.T) {
 	if err := v.CanValidate(); err == nil || err != errNilProviderURL {
 		t.Errorf("expected %s", errNilProviderURL)
 	}
-}
-
-func Test_Validator_ReturnsErrorWhenProvierStateIsMissing(t *testing.T) {
-	v := newConsumerValidator(nil, nil, DefaultLogger)
-	interaction, _ := consumer.NewInteraction("description", "state", provider.NewJSONRequest("Get", "/", "", nil), provider.NewJSONResponse(200, nil))
-	f := io.NewPactFile("consumer", "provider", []*consumer.Interaction{interaction})
-
-	expErrMsg := fmt.Sprintf(errNotFoundProviderStateMsg, interaction.State)
-	v.ProviderService(&http.Client{}, &url.URL{})
-	if _, err := v.Validate(f, nil); err == nil {
-		t.Errorf("expected %s", expErrMsg)
-	} else if err.Error() != expErrMsg {
-		t.Errorf("expected %s, got %s", expErrMsg, err)
-	}
-
 }
 
 func Test_Validator_ReturnsErrorWhenRequestCreationFails(t *testing.T) {

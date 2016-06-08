@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/SEEK-Jobs/pact-go/consumer"
+	"github.com/imbusy/pact-go/consumer"
 	version "github.com/hashicorp/go-version"
 )
 

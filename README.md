@@ -176,10 +176,9 @@ func TestProviderHonoursPactWithConsumer(t *testing.T) {
 		//pact uri could be a local file
 		PactUri("../pacts/consumer_client-provider_api.json", nil).
 		//or could be a web url e.g. pact broker. You can also provide authorisation value in the config parameter
-		//PactUri("http://pact-broker/pacts/provider/provider%20api/consumer/consumer%20client/version/latest", nil).
-		ProviderState("there is a resource with id 23", ensureResourceExists, nil)
+		//PactUri("http://pact-broker/pacts/provider/provider%20api/consumer/consumer%20client/version/latest", nil)
 
-	if err := verifier.Verify(&http.Client{}, u); err != nil {
+	if err := verifier.VerifyState("there is a resource with id 23", &http.Client{}, u); err != nil {
 		t.Error(err)
 	}
 
@@ -188,10 +187,6 @@ func TestProviderHonoursPactWithConsumer(t *testing.T) {
 	}
 }
 
-func ensureResourceExists() error {
-	//implemenation to add the resource, so the api could return the expected data
-	return nil
-}
 ```
 
 #### 3. Run your test

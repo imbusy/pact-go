@@ -13,11 +13,10 @@ var (
 )
 
 type Verifier interface {
-	ProviderState(state string, setup, teardown Action) Verifier
 	ServiceProvider(providerName string) Verifier
 	HonoursPactWith(consumerName string) Verifier
 	PactUri(uri string, config *PactUriConfig) Verifier
-	Verify(c *http.Client, u *url.URL) error
+	VerifyState(state string, c *http.Client, u *url.URL) error
 	VerifyAllStatesTested() error
 }
 
@@ -66,27 +65,6 @@ func (v *pactFileVerfier) ServiceProvider(providerName string) Verifier {
 	return v
 }
 
-//ProviderState sets the setup and teardown action to be executed before a interaction with specific state gets verified
-func (v *pactFileVerfier) ProviderState(state string, setup, teardown Action) Verifier {
-	v.testedStates[state] = true
-
-	verifier := &pactFileVerfier{
-		stateActions:  make(map[string]*stateAction),
-		provider:      v.provider,
-		consumer:      v.consumer,
-		pactUri:       v.pactUri,
-		pactUriConfig: v.pactUriConfig,
-		validator:     v.validator,
-		config:        v.config,
-	}
-
-	//sacrificed empty state validation in favour of chaining
-	if state != "" {
-		verifier.stateActions[state] = &stateAction{setup: setup, teardown: teardown}
-	}
-	return verifier
-}
-
 //HonoursPactWith consumer with which pact needs to be honoured
 func (v *pactFileVerfier) HonoursPactWith(consumerName string) Verifier {
 	v.consumer = consumerName
@@ -104,7 +82,15 @@ func (v *pactFileVerfier) PactUri(uri string, config *PactUriConfig) Verifier {
 }
 
 //Verify verifies all the interactions of consumer against the provider
-func (v *pactFileVerfier) Verify(c *http.Client, u *url.URL) error {
+func (v *pactFileVerfier) VerifyState(state string, c *http.Client, u *url.URL) error {
+	v.testedStates[state] = true
+
+	v.stateActions = make(map[string]*stateAction)
+	//sacrificed empty state validation in favour of chaining
+	if state != "" {
+		v.stateActions[state] = &stateAction{}
+	}
+
 	v.validator.ProviderService(c, u)
 	if err := v.verifyInternalState(); err != nil {
 		return err
